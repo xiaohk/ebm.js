@@ -1,13 +1,18 @@
 const fs = require('fs');
 
 const loader = require('@assemblyscript/loader');
+const ConsoleImport = require('as-console/imports');
 
-const imports = { /* imports go here */ };
+const Console = new ConsoleImport();
+
+const imports = { ...Console.wasmImports };
 const wasmModule = loader.instantiateSync(
   // Use untouched.wasm for development, use optimized.wasm for distribution/external use
   fs.readFileSync('build/untouched.wasm'),
   imports
 );
+
+Console.wasmExports = wasmModule.exports;
 
 // Import the helper functions
 const wasm = wasmModule.exports;
@@ -73,9 +78,7 @@ class EBM {
   // Store an instance of WASM EBM
   ebm;
 
-  constructor(featureData, sampleData) {
-    // this.featureData = featureData;
-    // this.sampleData = sampleData;
+  constructor(featureData, sampleData, editingFeature) {
 
     /**
      * Pre-process the feature data
@@ -96,6 +99,9 @@ class EBM {
 
     let featureNamesPtr = __createStringArray(sampleData.featureNames);
     let featureTypesPtr = __createStringArray(sampleData.featureTypes);
+
+    let editingFeatureIndex = sampleData.featureNames.findIndex((d) => d === editingFeature);
+    console.log(editingFeatureIndex);
 
     // Create two 2D arrays for binEdge ([feature, bin]) and score ([feature, bin]) respectively
     // We mix continuous and categorical together (assume the categorical features
@@ -138,20 +144,21 @@ class EBM {
      * Step 2: For the interaction effect, we want to store the feature
      * indexes and the score.
      *
-     * Here we store 3D F64 arrays of names, edges, and scores
+     * Here we store arrays of indexes(2D), edges(3D), and scores(3D)
      */
-    let interactionNames = [];
+    let interactionIndexes = [];
     let interactionScores = [];
     let interactionBinEdges = [];
 
     featureData.features.forEach((d) => {
       if (d.type === 'interaction') {
         // Parse the feature name
-        let name1 = d.name1;
-        let name2 = d.name2;
+        let index1 = sampleData.featureNames.indexOf(d.name1);
+        let index2 = sampleData.featureNames.indexOf(d.name2);
 
-        let curNamesPtr = __createStringArray([name1, name2]);
-        interactionNames.push(curNamesPtr);
+        let curIndexesPtr = __newArray(wasm.Int32Array_ID, [index1, index2]);
+        __pin(curIndexesPtr);
+        interactionIndexes.push(curIndexesPtr);
 
         // Collect two bin edges
         let binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1);
@@ -177,11 +184,11 @@ class EBM {
     });
 
     // Create 3D arrays
-    let interactionNamesPtr = __newArray(wasm.StringArray2D_ID, interactionNames);
+    let interactionIndexesPtr = __newArray(wasm.Int32Array2D_ID, interactionIndexes);
     let interactionBinEdgesPtr = __newArray(wasm.Float64Array3D_ID, interactionBinEdges);
     let interactionScoresPtr = __newArray(wasm.Float64Array3D_ID, interactionScores);
 
-    __pin(interactionNamesPtr);
+    __pin(interactionIndexesPtr);
     __pin(interactionBinEdgesPtr);
     __pin(interactionScoresPtr);
 
@@ -189,7 +196,7 @@ class EBM {
      * Step 3: Pass the sample data to WASM. We directly transfer this 2D float
      * array to WASM (assume categorical features are encoded already)
      */
-    let samples = sampleData.samples.map(d => {
+    let samples = sampleData.samples.map((d) => {
       let curPtr = __newArray(wasm.Float64Array_ID, d);
       __pin(curPtr);
       return curPtr;
@@ -210,11 +217,12 @@ class EBM {
       binEdgesPtr,
       scoresPtr,
       featureData.intercept,
-      interactionNamesPtr,
+      interactionIndexesPtr,
       interactionBinEdgesPtr,
       interactionScoresPtr,
       samplesPtr,
-      labelsPtr
+      labelsPtr,
+      editingFeatureIndex
     );
     __pin(this.ebm);
 
@@ -225,7 +233,7 @@ class EBM {
     __unpin2DArray(samplesPtr);
     __unpin3DArray(interactionScoresPtr);
     __unpin3DArray(interactionBinEdgesPtr);
-    __unpin2DArray(interactionNamesPtr);
+    __unpin2DArray(interactionIndexesPtr);
     __unpin2DArray(scoresPtr);
     __unpin2DArray(binEdgesPtr);
     __unpin(featureTypesPtr);
@@ -234,12 +242,17 @@ class EBM {
 
   printData() {
 
-    let name = this.ebm.printName();
-    console.log(__getString(name));
+    let namePtr = this.ebm.printName();
+    let name = __getString(namePtr);
+    console.log('Editing: ', name);
 
     let binEdge = this.ebm.printBinEdge();
     console.log(__getArray(binEdge));
 
+  }
+
+  getPrediction() {
+    return __getArray(this.ebm.predLabels);
   }
 }
 
