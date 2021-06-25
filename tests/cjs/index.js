@@ -4,7 +4,10 @@ const myModule = require('../..');
 // --- Testing ---
 console.log('Start testing...');
 
-// --- Testing searchsorted() ---
+// --- Testing searchSortedLowerIndex() ---
 require('./searchSortedLowerIndex.test');
+
+// --- Testing EBM class ---
+require('./ebm.test');
 
 console.log('\nPassed all the tests!');
