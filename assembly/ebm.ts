@@ -62,6 +62,7 @@ export class __EBM {
   labels: Array<f64>;
 
   editingFeatureIndex: i32;
+  isClassification: bool;
 
   // --- Values needed to be computed ---
   
@@ -94,6 +95,7 @@ export class __EBM {
     samples: Array<Array<f64>>,
     labels: Array<f64>,
     editingFeatureIndex: i32,
+    isClassification: bool
   ) {
 
     // Step 1: Initialize properties from the arguments
@@ -108,6 +110,7 @@ export class __EBM {
     this.samples = samples;
     this.labels = labels;
     this.editingFeatureIndex = editingFeatureIndex;
+    this.isClassification = isClassification;
 
     /**
      * Step 2: Iterate through the sample data to initialize
@@ -116,6 +119,11 @@ export class __EBM {
      */
     this.predLabels = new Array<f64>(this.labels.length).fill(this.intercept);
     this.editingFeatureSampleMap = new Array<Array<i32>>(this.binEdges[this.editingFeatureIndex].length);
+
+    // Initialize the editing feature map
+    for (let b = 0; b < this.binEdges[this.editingFeatureIndex].length; b++) {
+      this.editingFeatureSampleMap[b] = new Array<i32>();
+    }
 
     for (let i = 0; i < this.samples.length; i++) {
       // Add main effect scores
@@ -126,13 +134,14 @@ export class __EBM {
         let curFeature = this.samples[i][j];
 
         // Use the feature value to find the corresponding bin
-        let binScore:f64;
+        let binIndex: i32;
+        let binScore: f64;
 
         if (curFeatureType == 'continuous') {
-          let binIndex = searchSortedLowerIndex(this.binEdges[j], curFeature);
+          binIndex = searchSortedLowerIndex(this.binEdges[j], curFeature);
           binScore = this.scores[j][binIndex];
         } else {
-          let binIndex = this.binEdges[j].indexOf(curFeature);
+          binIndex = this.binEdges[j].indexOf(curFeature);
           if (binIndex < 0) {
             // Unseen level during training => use 0 as score instead
             console.log(`>> Unseen feature: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
@@ -144,6 +153,12 @@ export class __EBM {
 
         // Add the current score to prediction
         this.predLabels[i] += binScore;
+
+        // If we encounter the editing feature, we also want to collect the sample
+        // IDs for each bin
+        if (j == this.editingFeatureIndex) {
+          this.editingFeatureSampleMap[binIndex].push(i);
+        }
       }
 
       // Add interaction effect scores
@@ -185,33 +200,70 @@ export class __EBM {
       }
     }
 
-  };
+  }
+
+  updateModel(changedBinIndexes: Array<i32>, changedScores: Array<f64>): void {
+    // Update the bin scores
+    let scoreDiffs = new Array<f64>(changedScores.length);
+
+    for (let i = 0; i < changedBinIndexes.length; i++) {
+      // Keep track the score difference for later faster prediction
+      scoreDiffs[i] = changedScores[i] - this.scores[this.editingFeatureIndex][i];
+
+      this.scores[this.editingFeatureIndex][i] = changedScores[i];
+    }
+
+    // Update the prediction
+    this.updatePredictionPartial(changedBinIndexes, scoreDiffs);
+  }
+
+  updatePredictionPartial(changedBinIndexes: Array<i32>, scoreDiffs: Array<f64>): void {
+    // We know which bin has been changed and which samples are affected, so we
+    // only need to update their predictions
+    for (let i = 0; i < changedBinIndexes.length; i++) {
+      let affectedSampleIDs = this.editingFeatureSampleMap[i];
+
+      for (let j = 0; j < affectedSampleIDs.length; j++) {
+        let s = affectedSampleIDs[j];
+        this.predLabels[s] += scoreDiffs[i];
+      }
+    }
+  }
+
+  returnMetrics(): Array<f64> {
+    let output = new Array<f64>();
+
+    if (!this.isClassification) {
+      output.push(this.computeRMSE(this.labels, this.predLabels));
+      output.push(this.computeMAE(this.labels, this.predLabels));
+    } else {
+      return output;
+    }
+
+    return output;
+  }
+
+  computeRMSE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+    let SESum = 0.0;
+    for (let i = 0; i < yTrue.length; i++) {
+      SESum += (yPred[i] - yTrue[i]) ** 2;
+    }
+    return Math.sqrt(SESum / yTrue.length);
+  }
+
+  computeMAE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+    let AESum = 0.0;
+    for (let i = 0; i < yTrue.length; i++) {
+      AESum += Math.abs(yTrue[i] - yPred[i]);
+    }
+    return AESum / yTrue.length;
+  }
 
   printName(): string {
     trace('editing', 1, this.editingFeatureIndex);
     return this.featureTypes[this.editingFeatureIndex];
-  }
+  };
 
-  getPred(): Array<f64> {
-    return this.predLabels;
-  }
-
-  printBinEdge(): Array<f64> {
-    // trace('here', 1, this.binEdges.length);
-    // trace('here', 1, this.binEdges[2].length);
-    // trace('here', 1, this.binEdges[1].length);
-
-    // trace('inter', 3, this.interactionScores.length, this.interactionScores[0].length, this.interactionScores[0][0].length);
-    // trace('inter', 1, this.interactionScores[12][2][0]);
-
-    // trace('sample', 3, this.samples.length, this.samples[0].length, this.samples[1].length);
-    // trace('sample', 1, this.samples[3][3]);
-
-    // trace('label', 2, this.labels.length, this.labels[3]);
-
-    // trace('predLabel', 2, this.predLabels.length, this.predLabels[0]);
-    return this.binEdges[0];
-  }
 }
 
 // We need unique array id so we can allocate them in JS

@@ -80,7 +80,7 @@ class EBM {
   // Store an instance of WASM EBM
   ebm;
 
-  constructor(featureData, sampleData, editingFeature) {
+  constructor(featureData, sampleData, editingFeature, isClassification) {
 
     /**
      * Pre-process the feature data
@@ -103,7 +103,6 @@ class EBM {
     let featureTypesPtr = __createStringArray(sampleData.featureTypes);
 
     let editingFeatureIndex = sampleData.featureNames.findIndex((d) => d === editingFeature);
-    console.log(editingFeatureIndex);
 
     // Create two 2D arrays for binEdge ([feature, bin]) and score ([feature, bin]) respectively
     // We mix continuous and categorical together (assume the categorical features
@@ -224,7 +223,8 @@ class EBM {
       interactionScoresPtr,
       samplesPtr,
       labelsPtr,
-      editingFeatureIndex
+      editingFeatureIndex,
+      isClassification
     );
     __pin(this.ebm);
 
@@ -248,13 +248,58 @@ class EBM {
     let name = __getString(namePtr);
     console.log('Editing: ', name);
 
-    let binEdge = this.ebm.printBinEdge();
-    console.log(__getArray(binEdge));
-
   }
 
   getPrediction() {
     return __getArray(this.ebm.predLabels);
+  }
+
+  updateModel(changedBinIndexes, changedScores) {
+    let changedBinIndexesPtr = __newArray(wasm.Float64Array_ID, changedBinIndexes);
+    let changedScoresPtr = __newArray(wasm.Float64Array_ID, changedScores);
+
+    __pin(changedBinIndexesPtr);
+    __pin(changedScoresPtr);
+
+    this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);
+
+    __unpin(changedBinIndexesPtr);
+    __unpin(changedScoresPtr);
+  }
+
+  returnMetrics() {
+    let metrics = __getArray(this.ebm.returnMetrics());
+    return metrics;
+  }
+
+  __computeRMSE(yTrue, yPred) {
+    let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+    let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+    __pin(yTruePtr);
+    __pin(yPredPtr);
+
+    let result = this.ebm.computeRMSE(yTruePtr, yPredPtr);
+
+    __unpin(yTruePtr);
+    __unpin(yPredPtr);
+
+    return result;
+  }
+
+  __computeMAE(yTrue, yPred) {
+    let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+    let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+    __pin(yTruePtr);
+    __pin(yPredPtr);
+
+    let result = this.ebm.computeMAE(yTruePtr, yPredPtr);
+
+    __unpin(yTruePtr);
+    __unpin(yPredPtr);
+
+    return result;
   }
 }
 

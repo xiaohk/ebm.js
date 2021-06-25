@@ -1,9 +1,290 @@
 import loader from '@assemblyscript/loader';
-// import { sample } from '../build/optimized.wasm';
+import { ConsoleImport } from 'as-console/imports.esm.js';
 
-// export const testWASM = () => {
-//   sample({}).then((result) => {
-//     console.log(result);
-//   });
-// };
+const Console = new ConsoleImport();
+const imports = {...Console.wasmImports};
 
+
+export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) => {
+  return loader.instantiate(
+    fetch('/build/optimized.wasm').then((result) => result.arrayBuffer()),
+    imports
+  ).then(({ exports }) => {
+    Console.wasmExports = exports;
+    const wasm = exports;
+    const __pin = wasm.__pin;
+    const __unpin = wasm.__unpin;
+    const __newArray = wasm.__newArray;
+    const __getArray = wasm.__getArray;
+    const __newString = wasm.__newString;
+    const __getString = wasm.__getString;
+
+    /**
+     * Convert a JS string array to pointer of string pointers in AS
+     * @param {[string]} strings String array
+     * @returns Pointer to the array of string pointers
+     */
+    const __createStringArray = (strings) => {
+      let stringPtr = strings.map((n) => __newString(n));
+      let stringArrayPtr = __newArray(wasm.StringArray_ID, stringPtr);
+      __pin(stringArrayPtr);
+      return stringArrayPtr;
+    };
+
+    /**
+     * Utility function to free a 2D array
+     * @param {[[object]]} array2d 2D array
+     */
+    const __unpin2DArray = (array2d) => {
+      for (let i = 0; i < array2d.length; i++) {
+        __unpin(array2d[i]);
+      }
+      __unpin(array2d);
+    };
+
+    /**
+     * Utility function to free a 3D array
+     * @param {[[[object]]]} array2d 3D array
+     */
+    const __unpin3DArray = (array3d) => {
+      for (let i = 0; i < array3d.length; i++) {
+        for (let j = 0; j < array3d[i].length; j++) {
+          __unpin(array3d[i][j]);
+        }
+        __unpin(array3d[i]);
+      }
+      __unpin(array3d);
+    };
+
+    class EBM {
+      // Store an instance of WASM EBM
+      ebm;
+
+      constructor(featureData, sampleData, editingFeature, isClassification) {
+
+        /**
+         * Pre-process the feature data
+         *
+         * Feature data includes the main effect and also the interaction effect, and
+         * we want to split those two.
+         */
+
+        // Step 1: For the main effect, we only need bin edges and scores stored with the same order
+        // of `featureNames` and `featureTypes`.
+
+        // Create an index map from feature name to their index in featureData
+        let featureDataNameMap = new Map();
+        featureData.features.forEach((d, i) => featureDataNameMap.set(d.name, i));
+
+        let sampleDataNameMap = new Map();
+        sampleData.featureNames.forEach((d, i) => sampleDataNameMap.set(d, i));
+
+        let featureNamesPtr = __createStringArray(sampleData.featureNames);
+        let featureTypesPtr = __createStringArray(sampleData.featureTypes);
+
+        let editingFeatureIndex = sampleData.featureNames.findIndex((d) => d === editingFeature);
+
+        // Create two 2D arrays for binEdge ([feature, bin]) and score ([feature, bin]) respectively
+        // We mix continuous and categorical together (assume the categorical features
+        // have been encoded)
+        let binEdges = [];
+        let scores = [];
+
+        // This loop won't encounter interaction terms
+        for (let i = 0; i < sampleData.featureNames.length; i++) {
+          let curName = sampleData.featureNames[i];
+          let curIndex = featureDataNameMap.get(curName);
+
+          let curScore = featureData.features[curIndex].additive.slice();
+          let curBinEdge;
+
+          if (sampleData.featureTypes[i] === 'categorical') {
+            curBinEdge = featureData.features[curIndex].binLabel.slice();
+          } else {
+            curBinEdge = featureData.features[curIndex].binEdge.slice(0, -1);
+          }
+
+          // Pin the inner 1D arrays
+          let curBinEdgePtr = __newArray(wasm.Float64Array_ID, curBinEdge);
+          __pin(curBinEdgePtr);
+
+          let curScorePtr = __newArray(wasm.Float64Array_ID, curScore);
+          __pin(curScorePtr);
+
+          binEdges.push(curBinEdgePtr);
+          scores.push(curScorePtr);
+        }
+
+        // Pin the 2D arrays
+        const binEdgesPtr = __newArray(wasm.Float64Array2D_ID, binEdges);
+        __pin(binEdgesPtr);
+        const scoresPtr = __newArray(wasm.Float64Array2D_ID, scores);
+        __pin(scoresPtr);
+
+        /**
+         * Step 2: For the interaction effect, we want to store the feature
+         * indexes and the score.
+         *
+         * Here we store arrays of indexes(2D), edges(3D), and scores(3D)
+         */
+        let interactionIndexes = [];
+        let interactionScores = [];
+        let interactionBinEdges = [];
+
+        featureData.features.forEach((d) => {
+          if (d.type === 'interaction') {
+            // Parse the feature name
+            let index1 = sampleData.featureNames.indexOf(d.name1);
+            let index2 = sampleData.featureNames.indexOf(d.name2);
+
+            let curIndexesPtr = __newArray(wasm.Int32Array_ID, [index1, index2]);
+            __pin(curIndexesPtr);
+            interactionIndexes.push(curIndexesPtr);
+
+            // Collect two bin edges
+            let binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1);
+            let binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2);
+            __pin(binEdge1Ptr);
+            __pin(binEdge2Ptr);
+
+            let curBinEdgesPtr = __newArray(wasm.Float64Array2D_ID, [binEdge1Ptr, binEdge2Ptr]);
+            __pin(curBinEdgesPtr);
+
+            interactionBinEdges.push(curBinEdgesPtr);
+
+            // Add the scores
+            let curScore2D = d.additive.map((a) => {
+              let aPtr = __newArray(wasm.Float64Array_ID, a);
+              __pin(aPtr);
+              return aPtr;
+            });
+            let curScore2DPtr = __newArray(wasm.Float64Array2D_ID, curScore2D);
+            __pin(curScore2DPtr);
+            interactionScores.push(curScore2DPtr);
+          }
+        });
+
+        // Create 3D arrays
+        let interactionIndexesPtr = __newArray(wasm.Int32Array2D_ID, interactionIndexes);
+        let interactionBinEdgesPtr = __newArray(wasm.Float64Array3D_ID, interactionBinEdges);
+        let interactionScoresPtr = __newArray(wasm.Float64Array3D_ID, interactionScores);
+
+        __pin(interactionIndexesPtr);
+        __pin(interactionBinEdgesPtr);
+        __pin(interactionScoresPtr);
+
+        /**
+         * Step 3: Pass the sample data to WASM. We directly transfer this 2D float
+         * array to WASM (assume categorical features are encoded already)
+         */
+        let samples = sampleData.samples.map((d) => {
+          let curPtr = __newArray(wasm.Float64Array_ID, d);
+          __pin(curPtr);
+          return curPtr;
+        });
+
+        let samplesPtr = __newArray(wasm.Float64Array2D_ID, samples);
+        __pin(samplesPtr);
+
+        let labelsPtr = __newArray(wasm.Float64Array_ID, sampleData.labels);
+        __pin(labelsPtr);
+
+        /**
+         * Step 4: Initialize the EBM in WASM
+         */
+        this.ebm = wasm.__EBM(
+          featureNamesPtr,
+          featureTypesPtr,
+          binEdgesPtr,
+          scoresPtr,
+          featureData.intercept,
+          interactionIndexesPtr,
+          interactionBinEdgesPtr,
+          interactionScoresPtr,
+          samplesPtr,
+          labelsPtr,
+          editingFeatureIndex,
+          isClassification
+        );
+        __pin(this.ebm);
+
+        /**
+         * Step 5: free the arrays created to communicate with WASM
+         */
+        __unpin(labelsPtr);
+        __unpin2DArray(samplesPtr);
+        __unpin3DArray(interactionScoresPtr);
+        __unpin3DArray(interactionBinEdgesPtr);
+        __unpin2DArray(interactionIndexesPtr);
+        __unpin2DArray(scoresPtr);
+        __unpin2DArray(binEdgesPtr);
+        __unpin(featureTypesPtr);
+        __unpin(featureNamesPtr);
+      }
+
+      printData() {
+
+        let namePtr = this.ebm.printName();
+        let name = __getString(namePtr);
+        console.log('Editing: ', name);
+
+      }
+
+      getPrediction() {
+        return __getArray(this.ebm.predLabels);
+      }
+
+      updateModel(changedBinIndexes, changedScores) {
+        let changedBinIndexesPtr = __newArray(wasm.Float64Array_ID, changedBinIndexes);
+        let changedScoresPtr = __newArray(wasm.Float64Array_ID, changedScores);
+
+        __pin(changedBinIndexesPtr);
+        __pin(changedScoresPtr);
+
+        this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);
+
+        __unpin(changedBinIndexesPtr);
+        __unpin(changedScoresPtr);
+      }
+
+      returnMetrics() {
+        let metrics = __getArray(this.ebm.returnMetrics());
+        return metrics;
+      }
+
+      __computeRMSE(yTrue, yPred) {
+        let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+        let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+        __pin(yTruePtr);
+        __pin(yPredPtr);
+
+        let result = this.ebm.computeRMSE(yTruePtr, yPredPtr);
+
+        __unpin(yTruePtr);
+        __unpin(yPredPtr);
+
+        return result;
+      }
+
+      __computeMAE(yTrue, yPred) {
+        let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+        let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+        __pin(yTruePtr);
+        __pin(yPredPtr);
+
+        let result = this.ebm.computeMAE(yTruePtr, yPredPtr);
+
+        __unpin(yTruePtr);
+        __unpin(yPredPtr);
+
+        return result;
+      }
+    }
+
+    let model = new EBM(_featureData, _sampleData, _editingFeature, _isClassification);
+    return model;
+
+  });
+};
