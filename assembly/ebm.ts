@@ -39,6 +39,7 @@ export function searchSortedLowerIndex(sorted: Array<f64>, value: f64): i32 {
 
 export class __EBM {
 
+  // --- Initialization values ---
   featureNames: Array<string>;
   featureTypes: Array<string>;
 
@@ -49,11 +50,32 @@ export class __EBM {
   interactionScores: Array<Array<Array<f64>>>;
   interactionBinEdges: Array<Array<Array<f64>>>;
 
-  constructor(featureNames: Array<string>, featureTypes: Array<string>,
-    binEdges: Array<Array<f64>>, scores: Array<Array<f64>>,
+  samples: Array<Array<f64>>;
+
+  intercept: f64;
+
+  /**
+   * 
+   * @param featureNames Feature names
+   * @param featureTypes Feature types ('continuous', 'categorical')
+   * @param binEdges Bin left point (continuous) or labels (categorical)
+   * @param scores Bin additive score
+   * @param interactionNames Feature names of each interaction pair
+   * @param interactionBinEdges Array of pairs of bin edges for each interaction pair
+   * @param interactionScores Array of 2D additive scores for each interaction pair
+   * @param samples The data matrix [# of samples, # of features]
+   * @param intercept The intercept score
+   */
+  constructor(
+    featureNames: Array<string>,
+    featureTypes: Array<string>,
+    binEdges: Array<Array<f64>>,
+    scores: Array<Array<f64>>,
     interactionNames: Array<Array<string>>,
     interactionBinEdges: Array<Array<Array<f64>>>,
-    interactionScores: Array<Array<Array<f64>>>
+    interactionScores: Array<Array<Array<f64>>>,
+    samples: Array<Array<f64>>,
+    intercept: f64
   ) {
     this.featureNames = featureNames;
     this.featureTypes = featureTypes;
@@ -62,6 +84,8 @@ export class __EBM {
     this.interactionNames = interactionNames;
     this.interactionBinEdges = interactionBinEdges;
     this.interactionScores = interactionScores;
+    this.samples = samples;
+    this.intercept = intercept;
   };
 
   printName(): string {
@@ -76,6 +100,8 @@ export class __EBM {
     trace('inter', 3, this.interactionScores.length, this.interactionScores[0].length, this.interactionScores[0][0].length);
     trace('inter', 1, this.interactionScores[12][2][0]);
 
+    trace('sample', 3, this.samples.length, this.samples[0].length, this.samples[1].length);
+    trace('sample', 1, this.samples[3][3]);
     return this.binEdges[0];
   }
 }

@@ -19,7 +19,6 @@ const __newArray = wasm.__newArray;
 const __getArray = wasm.__getArray;
 const __newString = wasm.__newString;
 const __getString = wasm.__getString;
-wasm.__new;
 
 /**
  * JS wrapper for the searchsorted() from WASM, which finds the index where
@@ -52,8 +51,8 @@ class EBM {
   ebm;
 
   constructor(featureData, sampleData) {
-    this.featureData = featureData;
-    this.sampleData = sampleData;
+    // this.featureData = featureData;
+    // this.sampleData = sampleData;
 
     /**
      * Pre-process the feature data
@@ -124,10 +123,7 @@ class EBM {
 
     featureData.features.forEach((d) => {
       if (d.type === 'interaction') {
-        console.log(d.name);
         // Parse the feature name
-        // let name1 = d.name.replace(/(.*)\sx\s(.*)/, '$1');
-        // let name2 = d.name.replace(/(.*)\sx\s(.*)/, '$2');
         let name1 = d.name1;
         let name2 = d.name2;
 
@@ -166,8 +162,28 @@ class EBM {
     __pin(interactionBinEdgesPtr);
     __pin(interactionScoresPtr);
 
-    this.ebm = wasm.__EBM(featureNamesPtr, featureTypesPtr, binEdgesPtr,
-      scoresPtr, interactionNamesPtr, interactionBinEdgesPtr, interactionScoresPtr
+    /**
+     * Step 3: Pass the sample data to WASM. We directly transfer this 2D float
+     * array to WASM (assume categorical features are encoded already)
+     */
+    let samples = sampleData.samples.map(d => {
+      let curPtr = __newArray(wasm.Float64Array_ID, d);
+      __pin(curPtr);
+      return curPtr;
+    });
+    let samplesPtr = __newArray(wasm.Float64Array2D_ID, samples);
+    __pin(samplesPtr);
+
+    this.ebm = wasm.__EBM(
+      featureNamesPtr,
+      featureTypesPtr,
+      binEdgesPtr,
+      scoresPtr,
+      interactionNamesPtr,
+      interactionBinEdgesPtr,
+      interactionScoresPtr,
+      samplesPtr,
+      featureData.intercept
     );
     __pin(this.ebm);
   }

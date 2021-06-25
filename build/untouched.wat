@@ -6,7 +6,9 @@
  (type $none_=>_none (func))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
- (type $i32_i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $i32_f64_=>_none (func (param i32 f64)))
+ (type $i32_=>_f64 (func (param i32) (result f64)))
+ (type $i32_i32_i32_i32_i32_i32_i32_i32_i32_f64_=>_i32 (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 f64) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
@@ -33,10 +35,10 @@
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $assembly/ebm/__EBM i32 (i32.const 9))
- (global $~lib/rt/__rtti_base i32 (i32.const 784))
- (global $~lib/memory/__data_end i32 (i32.const 868))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 17252))
- (global $~lib/memory/__heap_base i32 (i32.const 17252))
+ (global $~lib/rt/__rtti_base i32 (i32.const 816))
+ (global $~lib/memory/__data_end i32 (i32.const 900))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 17284))
+ (global $~lib/memory/__heap_base i32 (i32.const 17284))
  (memory $0 1)
  (data (i32.const 12) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00$\00\00\00I\00n\00d\00e\00x\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00\00\00\00\00\00\00\00\00")
  (data (i32.const 76) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\1a\00\00\00~\00l\00i\00b\00/\00a\00r\00r\00a\00y\00.\00t\00s\00\00\00")
@@ -50,9 +52,10 @@
  (data (i32.const 460) "|\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00^\00\00\00E\00l\00e\00m\00e\00n\00t\00 \00t\00y\00p\00e\00 \00m\00u\00s\00t\00 \00b\00e\00 \00n\00u\00l\00l\00a\00b\00l\00e\00 \00i\00f\00 \00a\00r\00r\00a\00y\00 \00i\00s\00 \00h\00o\00l\00e\00y\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (data (i32.const 588) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\08\00\00\00h\00e\00r\00e\00\00\00\00\00")
  (data (i32.const 620) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\n\00\00\00i\00n\00t\00e\00r\00\00\00")
- (data (i32.const 652) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
- (data (i32.const 716) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
- (data (i32.const 784) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\t\00\00\00\00\00\00\02\1a\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 652) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\0c\00\00\00s\00a\00m\00p\00l\00e\00")
+ (data (i32.const 684) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
+ (data (i32.const 748) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
+ (data (i32.const 816) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\t\00\00\00\00\00\00\02\1a\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 1 funcref)
  (elem $0 (i32.const 1))
  (export "__EBM" (global $assembly/ebm/__EBM))
@@ -83,6 +86,10 @@
  (export "__EBM#set:interactionScores" (func $export:assembly/ebm/__EBM#set:interactionScores))
  (export "__EBM#get:interactionBinEdges" (func $export:assembly/ebm/__EBM#get:interactionBinEdges))
  (export "__EBM#set:interactionBinEdges" (func $export:assembly/ebm/__EBM#set:interactionBinEdges))
+ (export "__EBM#get:samples" (func $export:assembly/ebm/__EBM#get:samples))
+ (export "__EBM#set:samples" (func $export:assembly/ebm/__EBM#set:samples))
+ (export "__EBM#get:intercept" (func $export:assembly/ebm/__EBM#get:intercept))
+ (export "__EBM#set:intercept" (func $export:assembly/ebm/__EBM#set:intercept))
  (export "__EBM#constructor" (func $export:assembly/ebm/__EBM#constructor))
  (export "__EBM#printName" (func $export:assembly/ebm/__EBM#printName))
  (export "__EBM#printBinEdge" (func $export:assembly/ebm/__EBM#printBinEdge))
@@ -529,6 +536,20 @@
   local.get $1
   i32.const 0
   call $~lib/rt/itcms/__link
+ )
+ (func $assembly/ebm/__EBM#set:samples (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=28
+  local.get $0
+  local.get $1
+  i32.const 0
+  call $~lib/rt/itcms/__link
+ )
+ (func $assembly/ebm/__EBM#set:intercept (param $0 i32) (param $1 f64)
+  local.get $0
+  local.get $1
+  f64.store offset=32
  )
  (func $~lib/rt/itcms/visitRoots (param $0 i32)
   (local $1 i32)
@@ -2664,6 +2685,14 @@
   local.get $0
   i32.load offset=24
  )
+ (func $assembly/ebm/__EBM#get:samples (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=28
+ )
+ (func $assembly/ebm/__EBM#get:intercept (param $0 i32) (result f64)
+  local.get $0
+  f64.load offset=32
+ )
  (func $~lib/array/Array<~lib/array/Array<f64>>#get:length (param $0 i32) (result i32)
   local.get $0
   i32.load offset=12
@@ -2685,7 +2714,7 @@
    i32.const 3
    i32.eq
    if
-    i32.const 672
+    i32.const 704
     i32.const 144
     i32.const 337
     i32.const 7
@@ -2717,7 +2746,7 @@
   i32.const 3
   i32.ne
   if
-   i32.const 736
+   i32.const 768
    i32.const 144
    i32.const 351
    i32.const 5
@@ -2805,10 +2834,10 @@
   i32.const 288
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 672
+  i32.const 704
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 736
+  i32.const 768
   local.get $0
   call $~lib/rt/itcms/__visit
  )
@@ -3107,6 +3136,14 @@
    local.get $1
    call $~lib/rt/itcms/__visit
   end
+  local.get $0
+  i32.load offset=28
+  local.tee $2
+  if
+   local.get $2
+   local.get $1
+   call $~lib/rt/itcms/__visit
+  end
  )
  (func $~lib/rt/__visit_members (param $0 i32) (param $1 i32)
   block $invalid
@@ -3196,8 +3233,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 17280
-   i32.const 17328
+   i32.const 17312
+   i32.const 17360
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -3420,6 +3457,85 @@
   f64.const 0
   f64.const 0
   call $~lib/builtins/trace
+  i32.const 672
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 3
+  local.get $0
+  i32.load offset=28
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<~lib/array/Array<f64>>#get:length
+  f64.convert_i32_s
+  local.get $0
+  i32.load offset=28
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 0
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<f64>#get:length
+  f64.convert_i32_s
+  local.get $0
+  i32.load offset=28
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 1
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<f64>#get:length
+  f64.convert_i32_s
+  f64.const 0
+  f64.const 0
+  call $~lib/builtins/trace
+  i32.const 672
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 1
+  local.get $0
+  i32.load offset=28
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 3
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  i32.const 3
+  call $~lib/array/Array<f64>#__get
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  call $~lib/builtins/trace
   local.get $0
   i32.load offset=8
   local.set $1
@@ -3436,8 +3552,8 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (result i32)
-  (local $8 i32)
+ (func $assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 f64) (result i32)
+  (local $10 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.sub
@@ -3450,7 +3566,7 @@
   i32.eqz
   if
    global.get $~lib/memory/__stack_pointer
-   i32.const 28
+   i32.const 40
    i32.const 9
    call $~lib/rt/itcms/__new
    local.tee $0
@@ -3478,6 +3594,12 @@
   i32.const 0
   call $assembly/ebm/__EBM#set:interactionBinEdges
   local.get $0
+  i32.const 0
+  call $assembly/ebm/__EBM#set:samples
+  local.get $0
+  f64.const 0
+  call $assembly/ebm/__EBM#set:intercept
+  local.get $0
   local.get $1
   call $assembly/ebm/__EBM#set:featureNames
   local.get $0
@@ -3499,12 +3621,18 @@
   local.get $7
   call $assembly/ebm/__EBM#set:interactionScores
   local.get $0
-  local.set $8
+  local.get $8
+  call $assembly/ebm/__EBM#set:samples
+  local.get $0
+  local.get $9
+  call $assembly/ebm/__EBM#set:intercept
+  local.get $0
+  local.set $10
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $8
+  local.get $10
  )
  (func $~lib/array/Array<~lib/array/Array<~lib/string/String>>#__get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
@@ -4023,10 +4151,85 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (result i32)
-  (local $8 i32)
+ (func $export:assembly/ebm/__EBM#get:samples (param $0 i32) (result i32)
+  (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 32
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/ebm/__EBM#get:samples
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/ebm/__EBM#set:samples (param $0 i32) (param $1 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  local.get $1
+  call $assembly/ebm/__EBM#set:samples
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/ebm/__EBM#get:intercept (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/ebm/__EBM#get:intercept
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/ebm/__EBM#set:intercept (param $0 i32) (param $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  local.get $1
+  call $assembly/ebm/__EBM#set:intercept
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 f64) (result i32)
+  (local $10 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 36
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
@@ -4054,6 +4257,9 @@
   global.get $~lib/memory/__stack_pointer
   local.get $7
   i32.store offset=28
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=32
   local.get $0
   local.get $1
   local.get $2
@@ -4062,13 +4268,15 @@
   local.get $5
   local.get $6
   local.get $7
+  local.get $8
+  local.get $9
   call $assembly/ebm/__EBM#constructor
-  local.set $8
+  local.set $10
   global.get $~lib/memory/__stack_pointer
-  i32.const 32
+  i32.const 36
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $8
+  local.get $10
  )
  (func $export:assembly/ebm/__EBM#printName (param $0 i32) (result i32)
   (local $1 i32)
