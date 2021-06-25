@@ -42,41 +42,50 @@ export class __EBM {
   featureNames: Array<string>;
   featureTypes: Array<string>;
 
-  contBinEdges: Array<Array<f64>>;
-  contScores: Array<Array<f64>>;
-  catBinEdges: Array<Array<string>>;
-  catScores: Array<Array<f64>>;
+  binEdges: Array<Array<f64>>;
+  scores: Array<Array<f64>>;
+
+  interactionNames: Array<Array<string>>;
+  interactionScores: Array<Array<Array<f64>>>;
+  interactionBinEdges: Array<Array<Array<f64>>>;
 
   constructor(featureNames: Array<string>, featureTypes: Array<string>,
-    contBinEdges: Array<Array<f64>>, contScores: Array<Array<f64>>,
-    catBinEdges: Array<Array<string>>, catScores: Array<Array<f64>>
+    binEdges: Array<Array<f64>>, scores: Array<Array<f64>>,
+    interactionNames: Array<Array<string>>,
+    interactionBinEdges: Array<Array<Array<f64>>>,
+    interactionScores: Array<Array<Array<f64>>>
   ) {
     this.featureNames = featureNames;
     this.featureTypes = featureTypes;
-    this.contBinEdges = contBinEdges;
-    this.contScores = contScores;
-    this.catBinEdges = catBinEdges;
-    this.catScores = catScores;
+    this.binEdges = binEdges;
+    this.scores = scores;
+    this.interactionNames = interactionNames;
+    this.interactionBinEdges = interactionBinEdges;
+    this.interactionScores = interactionScores;
   };
 
   printName(): string {
-    // console.log('hehe');
-    return this.featureTypes[0];
+    return this.interactionNames[12][1];
   }
 
   printBinEdge(): Array<f64> {
-    trace('here', 1, this.contBinEdges.length);
-    trace('here', 1, this.catBinEdges.length);
-    trace('here', 1, this.contBinEdges[1].length);
+    trace('here', 1, this.binEdges.length);
+    trace('here', 1, this.binEdges[2].length);
+    trace('here', 1, this.binEdges[1].length);
 
-    return this.contBinEdges[0];
+    trace('inter', 3, this.interactionScores.length, this.interactionScores[0].length, this.interactionScores[0][0].length);
+    trace('inter', 1, this.interactionScores[12][2][0]);
+
+    return this.binEdges[0];
   }
 }
 
 // We need unique array id so we can allocate them in JS
 export const Int32Array_ID = idof<Array<i32>>();
+
 export const Float64Array_ID = idof<Array<f64>>();
 export const Float64Array2D_ID = idof<Array<Array<f64>>>();
-export const StringArray2D_ID = idof<Array<Array<string>>>();
+export const Float64Array3D_ID = idof<Array<Array<Array<f64>>>>();
+
 export const StringArray_ID = idof<Array<string>>();
-export const StringInt32Map_ID = idof<Map<string, i32>>();
+export const StringArray2D_ID = idof<Array<Array<string>>>();

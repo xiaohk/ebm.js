@@ -32,7 +32,8 @@ module.exports = {
     'id-length': 'off',
     'no-floating-decimal': 'off',
     'import/no-anonymous-default-export': 'off',
-    'promise/catch-or-return': 'off'
+    'promise/catch-or-return': 'off',
+    '@shopify/prefer-early-return': 'off'
   },
   root: true,
   globals: {

@@ -2,11 +2,11 @@
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
- (type $none_=>_none (func))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (type $none_=>_none (func))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
- (type $i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $i32_i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
@@ -17,9 +17,9 @@
  (global $assembly/ebm/Int32Array_ID i32 (i32.const 3))
  (global $assembly/ebm/Float64Array_ID i32 (i32.const 4))
  (global $assembly/ebm/Float64Array2D_ID i32 (i32.const 5))
- (global $assembly/ebm/StringArray2D_ID i32 (i32.const 7))
- (global $assembly/ebm/StringArray_ID i32 (i32.const 6))
- (global $assembly/ebm/StringInt32Map_ID i32 (i32.const 8))
+ (global $assembly/ebm/Float64Array3D_ID i32 (i32.const 6))
+ (global $assembly/ebm/StringArray_ID i32 (i32.const 7))
+ (global $assembly/ebm/StringArray2D_ID i32 (i32.const 8))
  (global $~lib/rt/itcms/white (mut i32) (i32.const 0))
  (global $~lib/rt/itcms/iter (mut i32) (i32.const 0))
  (global $~lib/rt/itcms/toSpace (mut i32) (i32.const 0))
@@ -33,10 +33,10 @@
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $assembly/ebm/__EBM i32 (i32.const 9))
- (global $~lib/rt/__rtti_base i32 (i32.const 752))
- (global $~lib/memory/__data_end i32 (i32.const 836))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 17220))
- (global $~lib/memory/__heap_base i32 (i32.const 17220))
+ (global $~lib/rt/__rtti_base i32 (i32.const 784))
+ (global $~lib/memory/__data_end i32 (i32.const 868))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 17252))
+ (global $~lib/memory/__heap_base i32 (i32.const 17252))
  (memory $0 1)
  (data (i32.const 12) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00$\00\00\00I\00n\00d\00e\00x\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00\00\00\00\00\00\00\00\00")
  (data (i32.const 76) ",\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\1a\00\00\00~\00l\00i\00b\00/\00a\00r\00r\00a\00y\00.\00t\00s\00\00\00")
@@ -49,18 +49,19 @@
  (data (i32.const 396) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (data (i32.const 460) "|\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00^\00\00\00E\00l\00e\00m\00e\00n\00t\00 \00t\00y\00p\00e\00 \00m\00u\00s\00t\00 \00b\00e\00 \00n\00u\00l\00l\00a\00b\00l\00e\00 \00i\00f\00 \00a\00r\00r\00a\00y\00 \00i\00s\00 \00h\00o\00l\00e\00y\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (data (i32.const 588) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\08\00\00\00h\00e\00r\00e\00\00\00\00\00")
- (data (i32.const 620) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
- (data (i32.const 684) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
- (data (i32.const 752) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\t\00\00\00\00\00\00\02\1a\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\10\t\82\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data (i32.const 620) "\1c\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00\n\00\00\00i\00n\00t\00e\00r\00\00\00")
+ (data (i32.const 652) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
+ (data (i32.const 716) "<\00\00\00\00\00\00\00\00\00\00\00\01\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
+ (data (i32.const 784) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02\t\00\00\00\00\00\00\02\1a\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\02A\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 1 funcref)
  (elem $0 (i32.const 1))
  (export "__EBM" (global $assembly/ebm/__EBM))
  (export "Int32Array_ID" (global $assembly/ebm/Int32Array_ID))
  (export "Float64Array_ID" (global $assembly/ebm/Float64Array_ID))
  (export "Float64Array2D_ID" (global $assembly/ebm/Float64Array2D_ID))
- (export "StringArray2D_ID" (global $assembly/ebm/StringArray2D_ID))
+ (export "Float64Array3D_ID" (global $assembly/ebm/Float64Array3D_ID))
  (export "StringArray_ID" (global $assembly/ebm/StringArray_ID))
- (export "StringInt32Map_ID" (global $assembly/ebm/StringInt32Map_ID))
+ (export "StringArray2D_ID" (global $assembly/ebm/StringArray2D_ID))
  (export "__new" (func $~lib/rt/itcms/__new))
  (export "__pin" (func $~lib/rt/itcms/__pin))
  (export "__unpin" (func $~lib/rt/itcms/__unpin))
@@ -72,14 +73,16 @@
  (export "__EBM#set:featureNames" (func $export:assembly/ebm/__EBM#set:featureNames))
  (export "__EBM#get:featureTypes" (func $export:assembly/ebm/__EBM#get:featureTypes))
  (export "__EBM#set:featureTypes" (func $export:assembly/ebm/__EBM#set:featureTypes))
- (export "__EBM#get:contBinEdges" (func $export:assembly/ebm/__EBM#get:contBinEdges))
- (export "__EBM#set:contBinEdges" (func $export:assembly/ebm/__EBM#set:contBinEdges))
- (export "__EBM#get:contScores" (func $export:assembly/ebm/__EBM#get:contScores))
- (export "__EBM#set:contScores" (func $export:assembly/ebm/__EBM#set:contScores))
- (export "__EBM#get:catBinEdges" (func $export:assembly/ebm/__EBM#get:catBinEdges))
- (export "__EBM#set:catBinEdges" (func $export:assembly/ebm/__EBM#set:catBinEdges))
- (export "__EBM#get:catScores" (func $export:assembly/ebm/__EBM#get:catScores))
- (export "__EBM#set:catScores" (func $export:assembly/ebm/__EBM#set:catScores))
+ (export "__EBM#get:binEdges" (func $export:assembly/ebm/__EBM#get:binEdges))
+ (export "__EBM#set:binEdges" (func $export:assembly/ebm/__EBM#set:binEdges))
+ (export "__EBM#get:scores" (func $export:assembly/ebm/__EBM#get:scores))
+ (export "__EBM#set:scores" (func $export:assembly/ebm/__EBM#set:scores))
+ (export "__EBM#get:interactionNames" (func $export:assembly/ebm/__EBM#get:interactionNames))
+ (export "__EBM#set:interactionNames" (func $export:assembly/ebm/__EBM#set:interactionNames))
+ (export "__EBM#get:interactionScores" (func $export:assembly/ebm/__EBM#get:interactionScores))
+ (export "__EBM#set:interactionScores" (func $export:assembly/ebm/__EBM#set:interactionScores))
+ (export "__EBM#get:interactionBinEdges" (func $export:assembly/ebm/__EBM#get:interactionBinEdges))
+ (export "__EBM#set:interactionBinEdges" (func $export:assembly/ebm/__EBM#set:interactionBinEdges))
  (export "__EBM#constructor" (func $export:assembly/ebm/__EBM#constructor))
  (export "__EBM#printName" (func $export:assembly/ebm/__EBM#printName))
  (export "__EBM#printBinEdge" (func $export:assembly/ebm/__EBM#printBinEdge))
@@ -482,7 +485,7 @@
   i32.const 0
   call $~lib/rt/itcms/__link
  )
- (func $assembly/ebm/__EBM#set:contBinEdges (param $0 i32) (param $1 i32)
+ (func $assembly/ebm/__EBM#set:binEdges (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
   i32.store offset=8
@@ -491,7 +494,7 @@
   i32.const 0
   call $~lib/rt/itcms/__link
  )
- (func $assembly/ebm/__EBM#set:contScores (param $0 i32) (param $1 i32)
+ (func $assembly/ebm/__EBM#set:scores (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
   i32.store offset=12
@@ -500,7 +503,7 @@
   i32.const 0
   call $~lib/rt/itcms/__link
  )
- (func $assembly/ebm/__EBM#set:catBinEdges (param $0 i32) (param $1 i32)
+ (func $assembly/ebm/__EBM#set:interactionNames (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
   i32.store offset=16
@@ -509,7 +512,16 @@
   i32.const 0
   call $~lib/rt/itcms/__link
  )
- (func $assembly/ebm/__EBM#set:catScores (param $0 i32) (param $1 i32)
+ (func $assembly/ebm/__EBM#set:interactionBinEdges (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=24
+  local.get $0
+  local.get $1
+  i32.const 0
+  call $~lib/rt/itcms/__link
+ )
+ (func $assembly/ebm/__EBM#set:interactionScores (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
   i32.store offset=20
@@ -2632,27 +2644,31 @@
   local.get $0
   i32.load offset=4
  )
- (func $assembly/ebm/__EBM#get:contBinEdges (param $0 i32) (result i32)
+ (func $assembly/ebm/__EBM#get:binEdges (param $0 i32) (result i32)
   local.get $0
   i32.load offset=8
  )
- (func $assembly/ebm/__EBM#get:contScores (param $0 i32) (result i32)
+ (func $assembly/ebm/__EBM#get:scores (param $0 i32) (result i32)
   local.get $0
   i32.load offset=12
  )
- (func $assembly/ebm/__EBM#get:catBinEdges (param $0 i32) (result i32)
+ (func $assembly/ebm/__EBM#get:interactionNames (param $0 i32) (result i32)
   local.get $0
   i32.load offset=16
  )
- (func $assembly/ebm/__EBM#get:catScores (param $0 i32) (result i32)
+ (func $assembly/ebm/__EBM#get:interactionScores (param $0 i32) (result i32)
   local.get $0
   i32.load offset=20
+ )
+ (func $assembly/ebm/__EBM#get:interactionBinEdges (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=24
  )
  (func $~lib/array/Array<~lib/array/Array<f64>>#get:length (param $0 i32) (result i32)
   local.get $0
   i32.load offset=12
  )
- (func $~lib/array/Array<~lib/array/Array<~lib/string/String>>#get:length (param $0 i32) (result i32)
+ (func $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#get:length (param $0 i32) (result i32)
   local.get $0
   i32.load offset=12
  )
@@ -2669,7 +2685,7 @@
    i32.const 3
    i32.eq
    if
-    i32.const 640
+    i32.const 672
     i32.const 144
     i32.const 337
     i32.const 7
@@ -2701,7 +2717,7 @@
   i32.const 3
   i32.ne
   if
-   i32.const 704
+   i32.const 736
    i32.const 144
    i32.const 351
    i32.const 5
@@ -2789,10 +2805,10 @@
   i32.const 288
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 640
+  i32.const 672
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 704
+  i32.const 736
   local.get $0
   call $~lib/rt/itcms/__visit
  )
@@ -2882,6 +2898,56 @@
   local.get $0
   local.get $1
   call $~lib/array/Array<~lib/array/Array<f64>>#__visit
+ )
+ (func $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__visit (param $0 i32) (param $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  i32.const 1
+  drop
+  local.get $0
+  i32.load offset=4
+  local.set $2
+  local.get $2
+  local.get $0
+  i32.load offset=12
+  i32.const 2
+  i32.shl
+  i32.add
+  local.set $3
+  loop $while-continue|0
+   local.get $2
+   local.get $3
+   i32.lt_u
+   local.set $4
+   local.get $4
+   if
+    local.get $2
+    i32.load
+    local.set $5
+    local.get $5
+    if
+     local.get $5
+     local.get $1
+     call $~lib/rt/itcms/__visit
+    end
+    local.get $2
+    i32.const 4
+    i32.add
+    local.set $2
+    br $while-continue|0
+   end
+  end
+  local.get $0
+  i32.load
+  local.get $1
+  call $~lib/rt/itcms/__visit
+ )
+ (func $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>~visit (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__visit
  )
  (func $~lib/array/Array<~lib/string/String>#__visit (param $0 i32) (param $1 i32)
   (local $2 i32)
@@ -2983,80 +3049,6 @@
   local.get $1
   call $~lib/array/Array<~lib/array/Array<~lib/string/String>>#__visit
  )
- (func $~lib/map/Map<~lib/string/String,i32>#__visit (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  local.get $0
-  i32.load
-  local.get $1
-  call $~lib/rt/itcms/__visit
-  local.get $0
-  i32.load offset=8
-  local.set $2
-  i32.const 1
-  if (result i32)
-   i32.const 1
-  else
-   i32.const 0
-  end
-  drop
-  local.get $2
-  local.set $3
-  local.get $3
-  local.get $0
-  i32.load offset=16
-  i32.const 12
-  i32.mul
-  i32.add
-  local.set $4
-  loop $while-continue|0
-   local.get $3
-   local.get $4
-   i32.lt_u
-   local.set $5
-   local.get $5
-   if
-    local.get $3
-    local.set $6
-    local.get $6
-    i32.load offset=8
-    i32.const 1
-    i32.and
-    i32.eqz
-    if
-     i32.const 1
-     drop
-     local.get $6
-     i32.load
-     local.set $7
-     i32.const 0
-     drop
-     local.get $7
-     local.get $1
-     call $~lib/rt/itcms/__visit
-     i32.const 0
-     drop
-    end
-    local.get $3
-    i32.const 12
-    i32.add
-    local.set $3
-    br $while-continue|0
-   end
-  end
-  local.get $2
-  local.get $1
-  call $~lib/rt/itcms/__visit
- )
- (func $~lib/map/Map<~lib/string/String,i32>~visit (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  call $~lib/map/Map<~lib/string/String,i32>#__visit
- )
  (func $assembly/ebm/__EBM~visit (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $0
@@ -3107,13 +3099,21 @@
    local.get $1
    call $~lib/rt/itcms/__visit
   end
+  local.get $0
+  i32.load offset=24
+  local.tee $2
+  if
+   local.get $2
+   local.get $1
+   call $~lib/rt/itcms/__visit
+  end
  )
  (func $~lib/rt/__visit_members (param $0 i32) (param $1 i32)
   block $invalid
    block $assembly/ebm/__EBM
-    block $~lib/map/Map<~lib/string/String,i32>
-     block $~lib/array/Array<~lib/array/Array<~lib/string/String>>
-      block $~lib/array/Array<~lib/string/String>
+    block $~lib/array/Array<~lib/array/Array<~lib/string/String>>
+     block $~lib/array/Array<~lib/string/String>
+      block $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>
        block $~lib/array/Array<~lib/array/Array<f64>>
         block $~lib/array/Array<f64>
          block $~lib/array/Array<i32>
@@ -3124,7 +3124,7 @@
              i32.const 8
              i32.sub
              i32.load
-             br_table $~lib/arraybuffer/ArrayBuffer $~lib/string/String $~lib/arraybuffer/ArrayBufferView $~lib/array/Array<i32> $~lib/array/Array<f64> $~lib/array/Array<~lib/array/Array<f64>> $~lib/array/Array<~lib/string/String> $~lib/array/Array<~lib/array/Array<~lib/string/String>> $~lib/map/Map<~lib/string/String,i32> $assembly/ebm/__EBM $invalid
+             br_table $~lib/arraybuffer/ArrayBuffer $~lib/string/String $~lib/arraybuffer/ArrayBufferView $~lib/array/Array<i32> $~lib/array/Array<f64> $~lib/array/Array<~lib/array/Array<f64>> $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>> $~lib/array/Array<~lib/string/String> $~lib/array/Array<~lib/array/Array<~lib/string/String>> $assembly/ebm/__EBM $invalid
             end
             return
            end
@@ -3152,17 +3152,17 @@
       end
       local.get $0
       local.get $1
-      call $~lib/array/Array<~lib/string/String>~visit
+      call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>~visit
       return
      end
      local.get $0
      local.get $1
-     call $~lib/array/Array<~lib/array/Array<~lib/string/String>>~visit
+     call $~lib/array/Array<~lib/string/String>~visit
      return
     end
     local.get $0
     local.get $1
-    call $~lib/map/Map<~lib/string/String,i32>~visit
+    call $~lib/array/Array<~lib/array/Array<~lib/string/String>>~visit
     return
    end
    local.get $0
@@ -3196,8 +3196,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 17248
-   i32.const 17296
+   i32.const 17280
+   i32.const 17328
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -3207,25 +3207,32 @@
  (func $assembly/ebm/__EBM#printName (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 4
+  i32.const 8
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
   global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store
+  i64.const 0
+  i64.store
   local.get $0
-  i32.load offset=4
+  i32.load offset=16
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  i32.const 12
+  call $~lib/array/Array<~lib/array/Array<~lib/string/String>>#__get
   local.set $1
   global.get $~lib/memory/__stack_pointer
   local.get $1
   i32.store
   local.get $1
-  i32.const 0
+  i32.const 1
   call $~lib/array/Array<~lib/string/String>#__get
   local.set $1
   global.get $~lib/memory/__stack_pointer
-  i32.const 4
+  i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $1
@@ -3233,7 +3240,7 @@
  (func $assembly/ebm/__EBM#printBinEdge (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 12
+  i32.const 16
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
@@ -3241,8 +3248,8 @@
   i64.const 0
   i64.store
   global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
+  i64.const 0
+  i64.store offset=8
   i32.const 608
   local.set $1
   global.get $~lib/memory/__stack_pointer
@@ -3272,13 +3279,20 @@
   local.get $1
   i32.const 1
   local.get $0
-  i32.load offset=16
+  i32.load offset=8
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 2
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
   local.set $1
   global.get $~lib/memory/__stack_pointer
   local.get $1
   i32.store offset=4
   local.get $1
-  call $~lib/array/Array<~lib/array/Array<~lib/string/String>>#get:length
+  call $~lib/array/Array<f64>#get:length
   f64.convert_i32_s
   f64.const 0
   f64.const 0
@@ -3313,6 +3327,99 @@
   f64.const 0
   f64.const 0
   call $~lib/builtins/trace
+  i32.const 640
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 3
+  local.get $0
+  i32.load offset=20
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#get:length
+  f64.convert_i32_s
+  local.get $0
+  i32.load offset=20
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 0
+  call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<~lib/array/Array<f64>>#get:length
+  f64.convert_i32_s
+  local.get $0
+  i32.load offset=20
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=12
+  local.get $1
+  i32.const 0
+  call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 0
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  call $~lib/array/Array<f64>#get:length
+  f64.convert_i32_s
+  f64.const 0
+  f64.const 0
+  call $~lib/builtins/trace
+  i32.const 640
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store
+  local.get $1
+  i32.const 1
+  local.get $0
+  i32.load offset=20
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=12
+  local.get $1
+  i32.const 12
+  call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=8
+  local.get $1
+  i32.const 2
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $1
+  i32.const 0
+  call $~lib/array/Array<f64>#__get
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  call $~lib/builtins/trace
   local.get $0
   i32.load offset=8
   local.set $1
@@ -3324,13 +3431,13 @@
   call $~lib/array/Array<~lib/array/Array<f64>>#__get
   local.set $1
   global.get $~lib/memory/__stack_pointer
-  i32.const 12
+  i32.const 16
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
-  (local $7 i32)
+ (func $assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (result i32)
+  (local $8 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.sub
@@ -3343,7 +3450,7 @@
   i32.eqz
   if
    global.get $~lib/memory/__stack_pointer
-   i32.const 24
+   i32.const 28
    i32.const 9
    call $~lib/rt/itcms/__new
    local.tee $0
@@ -3357,16 +3464,19 @@
   call $assembly/ebm/__EBM#set:featureTypes
   local.get $0
   i32.const 0
-  call $assembly/ebm/__EBM#set:contBinEdges
+  call $assembly/ebm/__EBM#set:binEdges
   local.get $0
   i32.const 0
-  call $assembly/ebm/__EBM#set:contScores
+  call $assembly/ebm/__EBM#set:scores
   local.get $0
   i32.const 0
-  call $assembly/ebm/__EBM#set:catBinEdges
+  call $assembly/ebm/__EBM#set:interactionNames
   local.get $0
   i32.const 0
-  call $assembly/ebm/__EBM#set:catScores
+  call $assembly/ebm/__EBM#set:interactionScores
+  local.get $0
+  i32.const 0
+  call $assembly/ebm/__EBM#set:interactionBinEdges
   local.get $0
   local.get $1
   call $assembly/ebm/__EBM#set:featureNames
@@ -3375,23 +3485,82 @@
   call $assembly/ebm/__EBM#set:featureTypes
   local.get $0
   local.get $3
-  call $assembly/ebm/__EBM#set:contBinEdges
+  call $assembly/ebm/__EBM#set:binEdges
   local.get $0
   local.get $4
-  call $assembly/ebm/__EBM#set:contScores
+  call $assembly/ebm/__EBM#set:scores
   local.get $0
   local.get $5
-  call $assembly/ebm/__EBM#set:catBinEdges
+  call $assembly/ebm/__EBM#set:interactionNames
   local.get $0
   local.get $6
-  call $assembly/ebm/__EBM#set:catScores
+  call $assembly/ebm/__EBM#set:interactionBinEdges
   local.get $0
-  local.set $7
+  local.get $7
+  call $assembly/ebm/__EBM#set:interactionScores
+  local.get $0
+  local.set $8
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $7
+  local.get $8
+ )
+ (func $~lib/array/Array<~lib/array/Array<~lib/string/String>>#__get (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store
+  local.get $1
+  local.get $0
+  i32.load offset=12
+  i32.ge_u
+  if
+   i32.const 32
+   i32.const 96
+   i32.const 99
+   i32.const 42
+   call $~lib/builtins/abort
+   unreachable
+  end
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.const 2
+  i32.shl
+  i32.add
+  i32.load
+  local.tee $2
+  i32.store
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  local.get $2
+  i32.eqz
+  if
+   i32.const 480
+   i32.const 96
+   i32.const 103
+   i32.const 40
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $2
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $3
  )
  (func $~lib/array/Array<~lib/string/String>#__get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
@@ -3450,6 +3619,62 @@
   local.get $3
  )
  (func $~lib/array/Array<~lib/array/Array<f64>>#__get (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store
+  local.get $1
+  local.get $0
+  i32.load offset=12
+  i32.ge_u
+  if
+   i32.const 32
+   i32.const 96
+   i32.const 99
+   i32.const 42
+   call $~lib/builtins/abort
+   unreachable
+  end
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.const 2
+  i32.shl
+  i32.add
+  i32.load
+  local.tee $2
+  i32.store
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  local.get $2
+  i32.eqz
+  if
+   i32.const 480
+   i32.const 96
+   i32.const 103
+   i32.const 40
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $2
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $3
+ )
+ (func $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#__get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   global.get $~lib/memory/__stack_pointer
@@ -3603,7 +3828,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#get:contBinEdges (param $0 i32) (result i32)
+ (func $export:assembly/ebm/__EBM#get:binEdges (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3614,7 +3839,7 @@
   local.get $0
   i32.store
   local.get $0
-  call $assembly/ebm/__EBM#get:contBinEdges
+  call $assembly/ebm/__EBM#get:binEdges
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3622,7 +3847,7 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $export:assembly/ebm/__EBM#set:contBinEdges (param $0 i32) (param $1 i32)
+ (func $export:assembly/ebm/__EBM#set:binEdges (param $0 i32) (param $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.sub
@@ -3636,13 +3861,13 @@
   i32.store offset=4
   local.get $0
   local.get $1
-  call $assembly/ebm/__EBM#set:contBinEdges
+  call $assembly/ebm/__EBM#set:binEdges
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#get:contScores (param $0 i32) (result i32)
+ (func $export:assembly/ebm/__EBM#get:scores (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3653,7 +3878,7 @@
   local.get $0
   i32.store
   local.get $0
-  call $assembly/ebm/__EBM#get:contScores
+  call $assembly/ebm/__EBM#get:scores
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3661,7 +3886,7 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $export:assembly/ebm/__EBM#set:contScores (param $0 i32) (param $1 i32)
+ (func $export:assembly/ebm/__EBM#set:scores (param $0 i32) (param $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.sub
@@ -3675,13 +3900,13 @@
   i32.store offset=4
   local.get $0
   local.get $1
-  call $assembly/ebm/__EBM#set:contScores
+  call $assembly/ebm/__EBM#set:scores
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#get:catBinEdges (param $0 i32) (result i32)
+ (func $export:assembly/ebm/__EBM#get:interactionNames (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3692,7 +3917,7 @@
   local.get $0
   i32.store
   local.get $0
-  call $assembly/ebm/__EBM#get:catBinEdges
+  call $assembly/ebm/__EBM#get:interactionNames
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3700,7 +3925,7 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $export:assembly/ebm/__EBM#set:catBinEdges (param $0 i32) (param $1 i32)
+ (func $export:assembly/ebm/__EBM#set:interactionNames (param $0 i32) (param $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.sub
@@ -3714,13 +3939,13 @@
   i32.store offset=4
   local.get $0
   local.get $1
-  call $assembly/ebm/__EBM#set:catBinEdges
+  call $assembly/ebm/__EBM#set:interactionNames
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#get:catScores (param $0 i32) (result i32)
+ (func $export:assembly/ebm/__EBM#get:interactionScores (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3731,7 +3956,7 @@
   local.get $0
   i32.store
   local.get $0
-  call $assembly/ebm/__EBM#get:catScores
+  call $assembly/ebm/__EBM#get:interactionScores
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -3739,7 +3964,7 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $export:assembly/ebm/__EBM#set:catScores (param $0 i32) (param $1 i32)
+ (func $export:assembly/ebm/__EBM#set:interactionScores (param $0 i32) (param $1 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.sub
@@ -3753,16 +3978,55 @@
   i32.store offset=4
   local.get $0
   local.get $1
-  call $assembly/ebm/__EBM#set:catScores
+  call $assembly/ebm/__EBM#set:interactionScores
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $export:assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
-  (local $7 i32)
+ (func $export:assembly/ebm/__EBM#get:interactionBinEdges (param $0 i32) (result i32)
+  (local $1 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 28
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/ebm/__EBM#get:interactionBinEdges
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/ebm/__EBM#set:interactionBinEdges (param $0 i32) (param $1 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  local.get $1
+  call $assembly/ebm/__EBM#set:interactionBinEdges
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/ebm/__EBM#constructor (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (result i32)
+  (local $8 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 32
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
@@ -3787,6 +4051,9 @@
   global.get $~lib/memory/__stack_pointer
   local.get $6
   i32.store offset=24
+  global.get $~lib/memory/__stack_pointer
+  local.get $7
+  i32.store offset=28
   local.get $0
   local.get $1
   local.get $2
@@ -3794,13 +4061,14 @@
   local.get $4
   local.get $5
   local.get $6
+  local.get $7
   call $assembly/ebm/__EBM#constructor
-  local.set $7
+  local.set $8
   global.get $~lib/memory/__stack_pointer
-  i32.const 28
+  i32.const 32
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $7
+  local.get $8
  )
  (func $export:assembly/ebm/__EBM#printName (param $0 i32) (result i32)
   (local $1 i32)
