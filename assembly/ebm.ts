@@ -40,19 +40,23 @@ export function searchSortedLowerIndex(sorted: Array<f64>, value: f64): i32 {
 export class __EBM {
 
   // --- Initialization values ---
+  // Feature information
   featureNames: Array<string>;
   featureTypes: Array<string>;
 
+  // Feature bin edges and additive score
   binEdges: Array<Array<f64>>;
   scores: Array<Array<f64>>;
+  intercept: f64;
 
+  // Bin edges and scores of interaction terms
   interactionNames: Array<Array<string>>;
   interactionScores: Array<Array<Array<f64>>>;
   interactionBinEdges: Array<Array<Array<f64>>>;
 
+  // The test dataset
   samples: Array<Array<f64>>;
-
-  intercept: f64;
+  labels: Array<f64>;
 
   /**
    * 
@@ -60,32 +64,35 @@ export class __EBM {
    * @param featureTypes Feature types ('continuous', 'categorical')
    * @param binEdges Bin left point (continuous) or labels (categorical)
    * @param scores Bin additive score
+   * @param intercept The intercept score
    * @param interactionNames Feature names of each interaction pair
    * @param interactionBinEdges Array of pairs of bin edges for each interaction pair
    * @param interactionScores Array of 2D additive scores for each interaction pair
    * @param samples The data matrix [# of samples, # of features]
-   * @param intercept The intercept score
+   * @param labels The data labels [# of samples]
    */
   constructor(
     featureNames: Array<string>,
     featureTypes: Array<string>,
     binEdges: Array<Array<f64>>,
     scores: Array<Array<f64>>,
+    intercept: f64,
     interactionNames: Array<Array<string>>,
     interactionBinEdges: Array<Array<Array<f64>>>,
     interactionScores: Array<Array<Array<f64>>>,
     samples: Array<Array<f64>>,
-    intercept: f64
+    labels: Array<f64>,
   ) {
     this.featureNames = featureNames;
     this.featureTypes = featureTypes;
     this.binEdges = binEdges;
     this.scores = scores;
+    this.intercept = intercept;
     this.interactionNames = interactionNames;
     this.interactionBinEdges = interactionBinEdges;
     this.interactionScores = interactionScores;
     this.samples = samples;
-    this.intercept = intercept;
+    this.labels = labels;
   };
 
   printName(): string {
@@ -102,6 +109,8 @@ export class __EBM {
 
     trace('sample', 3, this.samples.length, this.samples[0].length, this.samples[1].length);
     trace('sample', 1, this.samples[3][3]);
+
+    trace('label', 2, this.labels.length, this.labels[3]);
     return this.binEdges[0];
   }
 }

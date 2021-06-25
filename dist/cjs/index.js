@@ -46,6 +46,31 @@ const __createStringArray = (strings) => {
   return stringArrayPtr;
 };
 
+/**
+ * Utility function to free a 2D array
+ * @param {[[object]]} array2d 2D array
+ */
+const __unpin2DArray = (array2d) => {
+  for (let i = 0; i < array2d.length; i++) {
+    __unpin(array2d[i]);
+  }
+  __unpin(array2d);
+};
+
+/**
+ * Utility function to free a 3D array
+ * @param {[[[object]]]} array2d 3D array
+ */
+const __unpin3DArray = (array3d) => {
+  for (let i = 0; i < array3d.length; i++) {
+    for (let j = 0; j < array3d[i].length; j++) {
+      __unpin(array3d[i][j]);
+    }
+    __unpin(array3d[i]);
+  }
+  __unpin(array3d);
+};
+
 class EBM {
   // Store an instance of WASM EBM
   ebm;
@@ -171,21 +196,42 @@ class EBM {
       __pin(curPtr);
       return curPtr;
     });
+
     let samplesPtr = __newArray(wasm.Float64Array2D_ID, samples);
     __pin(samplesPtr);
 
+    let labelsPtr = __newArray(wasm.Float64Array_ID, sampleData.labels);
+    __pin(labelsPtr);
+
+    /**
+     * Step 4: Initialize the EBM in WASM
+     */
     this.ebm = wasm.__EBM(
       featureNamesPtr,
       featureTypesPtr,
       binEdgesPtr,
       scoresPtr,
+      featureData.intercept,
       interactionNamesPtr,
       interactionBinEdgesPtr,
       interactionScoresPtr,
       samplesPtr,
-      featureData.intercept
+      labelsPtr
     );
     __pin(this.ebm);
+
+    /**
+     * Step 5: free the arrays created to communicate with WASM
+     */
+    __unpin(labelsPtr);
+    __unpin2DArray(samplesPtr);
+    __unpin3DArray(interactionScoresPtr);
+    __unpin3DArray(interactionBinEdgesPtr);
+    __unpin2DArray(interactionNamesPtr);
+    __unpin2DArray(scoresPtr);
+    __unpin2DArray(binEdgesPtr);
+    __unpin(featureTypesPtr);
+    __unpin(featureNamesPtr);
   }
 
   printData() {
