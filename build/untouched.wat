@@ -4,16 +4,15 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $none_=>_none (func))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
- (type $i32_i32_i32_=>_f64 (func (param i32 i32 i32) (result f64)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_f64_=>_none (func (param i32 f64)))
  (type $i32_i32_f64_=>_none (func (param i32 i32 f64)))
  (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $i32_i32_i32_i32_i32_f64_i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 f64 i32 i32 i32 i32 i32 i32 i32) (result i32)))
- (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_f64_i32_i32_=>_i32 (func (param i32 f64 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
@@ -152,9 +151,9 @@
  (export "__EBM#updateModel" (func $export:assembly/ebm/__EBM#updateModel))
  (export "__EBM#updatePredictionPartial" (func $export:assembly/ebm/__EBM#updatePredictionPartial))
  (export "__EBM#returnMetrics" (func $export:assembly/ebm/__EBM#returnMetrics))
- (export "__EBM#computeRMSE" (func $export:assembly/ebm/__EBM#computeRMSE))
- (export "__EBM#computeMAE" (func $export:assembly/ebm/__EBM#computeMAE))
  (export "__EBM#printName" (func $export:assembly/ebm/__EBM#printName))
+ (export "rootMeanSquaredError" (func $export:assembly/ebm/rootMeanSquaredError))
+ (export "meanAbsoluteError" (func $export:assembly/ebm/meanAbsoluteError))
  (start $~start)
  (func $~lib/array/Array<f64>#get:length (param $0 i32) (result i32)
   local.get $0
@@ -7617,49 +7616,49 @@
   end
   return
  )
- (func $assembly/ebm/__EBM#computeRMSE (param $0 i32) (param $1 i32) (param $2 i32) (result f64)
-  (local $3 f64)
+ (func $assembly/ebm/rootMeanSquaredError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 f64)
+  (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
-  (local $6 f64)
+  (local $5 f64)
   f64.const 0
-  local.set $3
+  local.set $2
   i32.const 0
-  local.set $4
+  local.set $3
   loop $for-loop|0
-   local.get $4
-   local.get $1
+   local.get $3
+   local.get $0
    call $~lib/array/Array<f64>#get:length
    i32.lt_s
-   local.set $5
-   local.get $5
+   local.set $4
+   local.get $4
    if
-    local.get $3
     local.get $2
-    local.get $4
-    call $~lib/array/Array<f64>#__get
     local.get $1
-    local.get $4
+    local.get $3
+    call $~lib/array/Array<f64>#__get
+    local.get $0
+    local.get $3
     call $~lib/array/Array<f64>#__get
     f64.sub
     f64.const 2
     call $~lib/math/NativeMath.pow
     f64.add
-    local.set $3
-    local.get $4
+    local.set $2
+    local.get $3
     i32.const 1
     i32.add
-    local.set $4
+    local.set $3
     br $for-loop|0
    end
   end
-  local.get $3
-  local.get $1
+  local.get $2
+  local.get $0
   call $~lib/array/Array<f64>#get:length
   f64.convert_i32_s
   f64.div
-  local.set $6
-  local.get $6
+  local.set $5
+  local.get $5
   f64.sqrt
  )
  (func $~lib/array/Array<f64>#push (param $0 i32) (param $1 f64) (result i32)
@@ -7692,45 +7691,45 @@
   call $~lib/array/Array<f64>#set:length_
   local.get $3
  )
- (func $assembly/ebm/__EBM#computeMAE (param $0 i32) (param $1 i32) (param $2 i32) (result f64)
-  (local $3 f64)
+ (func $assembly/ebm/meanAbsoluteError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 f64)
+  (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
-  (local $6 f64)
+  (local $5 f64)
   f64.const 0
-  local.set $3
+  local.set $2
   i32.const 0
-  local.set $4
+  local.set $3
   loop $for-loop|0
-   local.get $4
-   local.get $1
+   local.get $3
+   local.get $0
    call $~lib/array/Array<f64>#get:length
    i32.lt_s
-   local.set $5
-   local.get $5
+   local.set $4
+   local.get $4
    if
-    local.get $3
-    local.get $1
-    local.get $4
-    call $~lib/array/Array<f64>#__get
     local.get $2
-    local.get $4
+    local.get $0
+    local.get $3
+    call $~lib/array/Array<f64>#__get
+    local.get $1
+    local.get $3
     call $~lib/array/Array<f64>#__get
     f64.sub
-    local.set $6
-    local.get $6
+    local.set $5
+    local.get $5
     f64.abs
     f64.add
-    local.set $3
-    local.get $4
+    local.set $2
+    local.get $3
     i32.const 1
     i32.add
-    local.set $4
+    local.set $3
     br $for-loop|0
    end
   end
-  local.get $3
-  local.get $1
+  local.get $2
+  local.get $0
   call $~lib/array/Array<f64>#get:length
   f64.convert_i32_s
   f64.div
@@ -9567,7 +9566,6 @@
   if
    local.get $1
    local.get $0
-   local.get $0
    i32.load offset=40
    local.set $2
    global.get $~lib/memory/__stack_pointer
@@ -9581,12 +9579,11 @@
    local.get $2
    i32.store offset=8
    local.get $2
-   call $assembly/ebm/__EBM#computeRMSE
+   call $assembly/ebm/rootMeanSquaredError
    call $~lib/array/Array<f64>#push
    drop
    local.get $1
    local.get $0
-   local.get $0
    i32.load offset=40
    local.set $2
    global.get $~lib/memory/__stack_pointer
@@ -9600,7 +9597,7 @@
    local.get $2
    i32.store offset=8
    local.get $2
-   call $assembly/ebm/__EBM#computeMAE
+   call $assembly/ebm/meanAbsoluteError
    call $~lib/array/Array<f64>#push
    drop
   else
@@ -11415,60 +11412,6 @@
   global.set $~lib/memory/__stack_pointer
   local.get $1
  )
- (func $export:assembly/ebm/__EBM#computeRMSE (param $0 i32) (param $1 i32) (param $2 i32) (result f64)
-  (local $3 f64)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  local.get $0
-  i32.store
-  global.get $~lib/memory/__stack_pointer
-  local.get $1
-  i32.store offset=4
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store offset=8
-  local.get $0
-  local.get $1
-  local.get $2
-  call $assembly/ebm/__EBM#computeRMSE
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $3
- )
- (func $export:assembly/ebm/__EBM#computeMAE (param $0 i32) (param $1 i32) (param $2 i32) (result f64)
-  (local $3 f64)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  local.get $0
-  i32.store
-  global.get $~lib/memory/__stack_pointer
-  local.get $1
-  i32.store offset=4
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store offset=8
-  local.get $0
-  local.get $1
-  local.get $2
-  call $assembly/ebm/__EBM#computeMAE
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $3
- )
  (func $export:assembly/ebm/__EBM#printName (param $0 i32) (result i32)
   (local $1 i32)
   global.get $~lib/memory/__stack_pointer
@@ -11487,5 +11430,51 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $1
+ )
+ (func $export:assembly/ebm/rootMeanSquaredError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  local.get $1
+  call $assembly/ebm/rootMeanSquaredError
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+ )
+ (func $export:assembly/ebm/meanAbsoluteError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  local.get $1
+  call $assembly/ebm/meanAbsoluteError
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
  )
 )

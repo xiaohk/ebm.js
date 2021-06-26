@@ -39,6 +39,36 @@ const __searchSortedLowerIndex = (sorted, value) => {
   return index;
 };
 
+const __rootMeanSquaredError = (yTrue, yPred) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let result = wasm.rootMeanSquaredError(yTruePtr, yPredPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+
+  return result;
+};
+
+const __meanAbsoluteError = (yTrue, yPred) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let result = wasm.meanAbsoluteError(yTruePtr, yPredPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+
+  return result;
+};
+
 /**
  * Convert a JS string array to pointer of string pointers in AS
  * @param {[string]} strings String array
@@ -271,40 +301,12 @@ class EBM {
     let metrics = __getArray(this.ebm.returnMetrics());
     return metrics;
   }
-
-  __computeRMSE(yTrue, yPred) {
-    let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-    let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-    __pin(yTruePtr);
-    __pin(yPredPtr);
-
-    let result = this.ebm.computeRMSE(yTruePtr, yPredPtr);
-
-    __unpin(yTruePtr);
-    __unpin(yPredPtr);
-
-    return result;
-  }
-
-  __computeMAE(yTrue, yPred) {
-    let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-    let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-    __pin(yTruePtr);
-    __pin(yPredPtr);
-
-    let result = this.ebm.computeMAE(yTruePtr, yPredPtr);
-
-    __unpin(yTruePtr);
-    __unpin(yPredPtr);
-
-    return result;
-  }
 }
 
 module.exports = wasmModule.exports;
 
 // Add new functions
 module.exports.__searchSortedLowerIndex = __searchSortedLowerIndex;
+module.exports.__meanAbsoluteError = __meanAbsoluteError;
+module.exports.__rootMeanSquaredError = __rootMeanSquaredError;
 module.exports.EBM = EBM;

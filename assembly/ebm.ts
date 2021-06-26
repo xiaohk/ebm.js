@@ -234,8 +234,8 @@ export class __EBM {
     let output = new Array<f64>();
 
     if (!this.isClassification) {
-      output.push(this.computeRMSE(this.labels, this.predLabels));
-      output.push(this.computeMAE(this.labels, this.predLabels));
+      output.push(rootMeanSquaredError(this.labels, this.predLabels));
+      output.push(meanAbsoluteError(this.labels, this.predLabels));
     } else {
       return output;
     }
@@ -243,27 +243,43 @@ export class __EBM {
     return output;
   }
 
-  computeRMSE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-    let SESum = 0.0;
-    for (let i = 0; i < yTrue.length; i++) {
-      SESum += (yPred[i] - yTrue[i]) ** 2;
-    }
-    return Math.sqrt(SESum / yTrue.length);
-  }
+  // computeRMSE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+  //   let SESum = 0.0;
+  //   for (let i = 0; i < yTrue.length; i++) {
+  //     SESum += (yPred[i] - yTrue[i]) ** 2;
+  //   }
+  //   return Math.sqrt(SESum / yTrue.length);
+  // }
 
-  computeMAE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-    let AESum = 0.0;
-    for (let i = 0; i < yTrue.length; i++) {
-      AESum += Math.abs(yTrue[i] - yPred[i]);
-    }
-    return AESum / yTrue.length;
-  }
+  // computeMAE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+  //   let AESum = 0.0;
+  //   for (let i = 0; i < yTrue.length; i++) {
+  //     AESum += Math.abs(yTrue[i] - yPred[i]);
+  //   }
+  //   return AESum / yTrue.length;
+  // }
 
   printName(): string {
     trace('editing', 1, this.editingFeatureIndex);
     return this.featureTypes[this.editingFeatureIndex];
   };
 
+}
+
+export function rootMeanSquaredError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+  let SESum = 0.0;
+  for (let i = 0; i < yTrue.length; i++) {
+    SESum += (yPred[i] - yTrue[i]) ** 2;
+  }
+  return Math.sqrt(SESum / yTrue.length);
+}
+
+export function meanAbsoluteError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+  let AESum = 0.0;
+  for (let i = 0; i < yTrue.length; i++) {
+    AESum += Math.abs(yTrue[i] - yPred[i]);
+  }
+  return AESum / yTrue.length;
 }
 
 // We need unique array id so we can allocate them in JS

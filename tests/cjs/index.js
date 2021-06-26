@@ -7,6 +7,9 @@ console.log('Start testing...');
 // --- Testing searchSortedLowerIndex() ---
 require('./searchSortedLowerIndex.test');
 
+// --- Testing metrics ---
+require('./metrics.test');
+
 // --- Testing EBM class ---
 require('./ebm.test');
 
