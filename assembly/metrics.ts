@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+
 /**
  * Common ML metrics implemented in WASM.
  *
@@ -136,8 +138,6 @@ export function getROCCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64
   let totalN = fps[fps.length - 1];
   let totalP = tps[tps.length - 1];
 
-  console.log([totalN, totalP]);
-
   // Add (0, 0) as the starting point
   let rocPoints = [[0.0, 0.0]];
 
@@ -161,26 +161,30 @@ export function getROCCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64
  *
  * @returns array of points (x is recall, y is precision)
  */
-// export function getPRCurve(yTrue, yScore) {
-//   // Get threshold along with TPs and FPs
-//   let thresholdResult = countByThreshold(yTrue, yScore)
-//   let fps = thresholdResult.fps
-//   let tps = thresholdResult.tps
+export function getPRCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64>> {
+  // Get threshold along with TPs and FPs
+  let fps = thresholdResult[0];
+  let tps = thresholdResult[1];
 
-//   // Remember the last entry of TPs is the total number of positive labels.
-//   let totalP = tps[tps.length - 1]
+  // Remember the last entry of TPs is the total number of positive labels.
+  let totalP = tps[tps.length - 1];
 
-//   // Add (0, 1) as the starting point
-//   let prPoints = [{ 'precision': 1, 'recall': 0 }]
+  // Add (1, 0) as the starting point
+  let prPoints = [[1.0, 0.0]];
 
-//   for (let i = 0; i < tps.length; i++) {
-//     prPoints.push(
-//       {
-//         'precision': tps[i] / (tps[i] + fps[i]),
-//         'recall': tps[i] / totalP
-//       }
-//     )
-//   }
+  for (let i = 0; i < tps.length; i++) {
+    prPoints.push(
+      [
+        tps[i] / (tps[i] + fps[i]),
+        tps[i] / totalP
+      ]
+    );
 
-//   return prPoints
-// }
+    // Stop when full recall is achieved
+    if (tps[i] / totalP == 1.0) {
+      break;
+    }
+  }
+
+  return prPoints;
+}

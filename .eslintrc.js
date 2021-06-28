@@ -34,7 +34,8 @@ module.exports = {
     'import/no-anonymous-default-export': 'off',
     'promise/catch-or-return': 'off',
     '@shopify/prefer-early-return': 'off',
-    'no-array-constructor': 'off'
+    'no-array-constructor': 'off',
+    'arrow-parens': 'off',
   },
   root: true,
   globals: {

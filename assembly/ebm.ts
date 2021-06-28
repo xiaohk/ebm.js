@@ -5,7 +5,7 @@
  */
 
 import { console } from 'as-console';
-import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve } from './metrics';
+import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve, getPRCurve } from './metrics';
 
 /**
  * Find the lower bound of a pair between where inserting `value` into `sorted`
@@ -252,7 +252,7 @@ export class __EBM {
 }
 
 // Export the metrics functions to JS for testing
-export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve };
+export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve, getPRCurve };
 
 // We need unique array id so we can allocate them in JS
 export const Int32Array_ID = idof<Array<i32>>();

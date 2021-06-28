@@ -45,9 +45,10 @@ const __searchSortedLowerIndex = (sorted, value) => {
  * @returns Pointer to the array of string pointers
  */
 const __createStringArray = (strings) => {
-  let stringPtr = strings.map((n) => __newString(n));
-  let stringArrayPtr = __newArray(wasm.StringArray_ID, stringPtr);
-  __pin(stringArrayPtr);
+  let stringPtrs = strings.map(str => __pin(__newString(str)));
+  let stringArrayPtr = __pin(__newArray(wasm.StringArray_ID, stringPtrs));
+  stringPtrs.forEach(ptr => __unpin(ptr));
+
   return stringArrayPtr;
 };
 
@@ -348,11 +349,41 @@ const __getROCCurve = (yTrue, yScore) => {
   __pin(yPredPtr);
 
   let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
+  __pin(countResult);
 
   let result = wasm.getROCCurve(countResult);
+
   // Unpack the pointer
   result = __getArray(result);
   result = result.map((d) => __getArray(d));
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  __unpin(countResult);
+
+  return result;
+};
+
+const __getPRCurve = (yTrue, yScore) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
+  __pin(countResult);
+
+  let result = wasm.getPRCurve(countResult);
+
+  // Unpack the pointer
+  result = __getArray(result);
+  result = result.map((d) => __getArray(d));
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  __unpin(countResult);
+
   return result;
 };
 
@@ -364,4 +395,5 @@ module.exports.__meanAbsoluteError = __meanAbsoluteError;
 module.exports.__rootMeanSquaredError = __rootMeanSquaredError;
 module.exports.__countByThreshold = __countByThreshold;
 module.exports.__getROCCurve = __getROCCurve;
+module.exports.__getPRCurve = __getPRCurve;
 module.exports.EBM = EBM;
