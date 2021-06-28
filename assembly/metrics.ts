@@ -130,22 +130,42 @@ export function getROCCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64
   let fps = thresholdResult[0];
   let tps = thresholdResult[1];
 
-  // TODO: Could drop thresholds where corresponding point is on the connected
+  // Could drop thresholds where corresponding point is on the connected
   // line of the previous and next points
+  let optimalFPs = [fps[0]];
+  let optimalTPs = [tps[0]];
+
+  for (let i = 0; i < tps.length - 2; i++) {
+    let fpDiff1 = fps[i + 2] - fps[i + 1];
+    let fpDiff2 = fps[i + 1] - fps[i];
+    let fpDiff = fpDiff1 - fpDiff2;
+
+    let tpDiff1 = tps[i + 2] - tps[i + 1];
+    let tpDiff2 = tps[i + 1] - tps[i];
+    let tpDiff = tpDiff1 - tpDiff2;
+
+    if (tpDiff != 0 || fpDiff != 0) {
+      optimalFPs.push(fps[i + 1]);
+      optimalTPs.push(tps[i + 1]);
+    }
+  }
+
+  optimalFPs.push(fps[fps.length - 1]);
+  optimalTPs.push(tps[tps.length - 1]);
 
   // Remember the last entry of TPs is the total number of positive labels, and
   // the last entry of FPs is the total number of negative labels
-  let totalN = fps[fps.length - 1];
-  let totalP = tps[tps.length - 1];
+  let totalN = optimalFPs[optimalFPs.length - 1];
+  let totalP = optimalTPs[optimalTPs.length - 1];
 
   // Add (0, 0) as the starting point
   let rocPoints = [[0.0, 0.0]];
 
-  for (let i = 0; i < tps.length; i++) {
+  for (let i = 0; i < optimalTPs.length; i++) {
     rocPoints.push(
       [
-        tps[i] / totalP,
-        fps[i] / totalN
+        optimalTPs[i] / totalP,
+        optimalFPs[i] / totalN
       ]
     );
   }

@@ -42,6 +42,11 @@ export function searchSortedLowerIndex(sorted: Array<f64>, value: f64): i32 {
   return right - 1;
 }
 
+function sigmoid(logit: f64): f64 {
+  let odd = Math.exp(logit);
+  return odd / (1 + odd);
+}
+
 export class __EBM {
 
   // --- Initialization values ---
@@ -71,6 +76,7 @@ export class __EBM {
   
   // Current prediction
   predLabels: Array<f64>;
+  predProbs: Array<f64>;
   editingFeatureSampleMap: Array<Array<i32>>;
 
   /**
@@ -121,6 +127,8 @@ export class __EBM {
      * - Editing feature's bin bucket info
      */
     this.predLabels = new Array<f64>(this.labels.length).fill(this.intercept);
+    this.predProbs = new Array<f64>(this.predLabels.length).fill(0.0);
+
     this.editingFeatureSampleMap = new Array<Array<i32>>(this.binEdges[this.editingFeatureIndex].length);
 
     // Initialize the editing feature map
@@ -201,6 +209,11 @@ export class __EBM {
         // Add the current score to prediction
         this.predLabels[i] += binScore;
       }
+
+      // If it is a classifier, then we have to convert the logit to prob
+      if (this.isClassification) {
+        this.predProbs[i] = sigmoid(this.predLabels[i]);
+      }
     }
 
   }
@@ -229,7 +242,20 @@ export class __EBM {
       for (let j = 0; j < affectedSampleIDs.length; j++) {
         let s = affectedSampleIDs[j];
         this.predLabels[s] += scoreDiffs[i];
+
+        // Update the prob if it is a classifier
+        if (this.isClassification) {
+          this.predProbs[s] = sigmoid(this.predLabels[s]);
+        }
       }
+    }
+  }
+
+  getPrediction(): Array<f64> {
+    if (this.isClassification) {
+      return this.predProbs;
+    } else {
+      return this.predLabels;
     }
   }
 
@@ -242,15 +268,8 @@ export class __EBM {
       curResult.push(meanAbsoluteError(this.labels, this.predLabels));
       output.push([curResult]);
     } else {
-      // Convert the logits into probabilities
-      let predProbs = new Array<f64>(this.predLabels.length);
-      for (let i = 0; i < this.predLabels.length; i++) {
-        let curOdd = Math.exp(this.predLabels[i]);
-        predProbs[i] = curOdd / (curOdd + 1);
-      }
-
       // Compute ROC curves and PR curves
-      let countResult = countByThreshold(this.labels, predProbs);
+      let countResult = countByThreshold(this.labels, this.predProbs);
       let rocPoints = getROCCurve(countResult);
       let prPoints = getPRCurve(countResult);
 
@@ -258,14 +277,14 @@ export class __EBM {
       output.push(prPoints);
 
       // Compute confusion matrix
-      let confusionMatrix = getConfusionMatrix(this.labels, predProbs);
+      let confusionMatrix = getConfusionMatrix(this.labels, this.predProbs);
 
       output.push([confusionMatrix]);
 
       // Compute summary statistics
       let rocAuc = getROCAuc(rocPoints);
       let averagePrecision = getAveragePrecision(prPoints);
-      let accuracy = getAccuracy(this.labels, predProbs);
+      let accuracy = getAccuracy(this.labels, this.predProbs);
 
       output.push([[accuracy, rocAuc, averagePrecision]]);
 

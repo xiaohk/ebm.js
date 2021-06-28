@@ -246,16 +246,28 @@ class EBM {
     __unpin(featureNamesPtr);
   }
 
-  printData() {
+  destroy() {
+    __unpin(this.ebm);
+    this.ebm = null;
+  }
 
+  printData() {
     let namePtr = this.ebm.printName();
     let name = __getString(namePtr);
     console.log('Editing: ', name);
+  }
 
+  getProb() {
+    let predProbs = __getArray(this.ebm.getPrediction());
+    return predProbs;
   }
 
   getPrediction() {
-    return __getArray(this.ebm.predLabels);
+    if (this.isClassification) {
+      let predProbs = __getArray(this.ebm.getPrediction());
+      return predProbs.map(d => (d >= 0.5 ? 1 : 0));
+    }
+    return __getArray(this.ebm.getPrediction());
   }
 
   updateModel(changedBinIndexes, changedScores) {
@@ -303,27 +315,31 @@ class EBM {
       let result3DPtr = __pin(result3D);
 
       let result1DPtrs = [];
-      let roc2D = __getArray(result3D[0].map(d => {
+      let roc2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(roc2D);
+
+      let rocPoints = roc2D.map(d => {
         let point = __getArray(d);
         result1DPtrs.push(__pin(point));
         return point;
-      }));
-      let result2DPtr = __pin(roc2D);
+      });
 
-      metrics.rocCurve = roc2D;
+      metrics.rocCurve = rocPoints;
       result1DPtrs.map(d => __unpin(d));
       __unpin(result2DPtr);
 
       // Unpack PR curves
       result1DPtrs = [];
-      let pr2D = __getArray(result3D[1].map(d => {
+      let pr2D = __getArray(result3D[1]);
+      result2DPtr = __pin(roc2D);
+
+      let prPoints = pr2D.map(d => {
         let point = __getArray(d);
         result1DPtrs.push(__pin(point));
         return point;
-      }));
-      result2DPtr = __pin(roc2D);
+      });
 
-      metrics.prCurve = pr2D;
+      metrics.prCurve = prPoints;
       result1DPtrs.map(d => __unpin(d));
       __unpin(result2DPtr);
 
