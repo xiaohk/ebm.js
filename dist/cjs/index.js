@@ -39,36 +39,6 @@ const __searchSortedLowerIndex = (sorted, value) => {
   return index;
 };
 
-const __rootMeanSquaredError = (yTrue, yPred) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
-
-  let result = wasm.rootMeanSquaredError(yTruePtr, yPredPtr);
-
-  __unpin(yTruePtr);
-  __unpin(yPredPtr);
-
-  return result;
-};
-
-const __meanAbsoluteError = (yTrue, yPred) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
-
-  let result = wasm.meanAbsoluteError(yTruePtr, yPredPtr);
-
-  __unpin(yTruePtr);
-  __unpin(yPredPtr);
-
-  return result;
-};
-
 /**
  * Convert a JS string array to pointer of string pointers in AS
  * @param {[string]} strings String array
@@ -303,10 +273,95 @@ class EBM {
   }
 }
 
+/**
+ * A JS wrapper of rootMeanSquaredError for testing
+ * @param {[number]} yTrue True values
+ * @param {[number]} yPred Predicted values
+ * @returns {number} score
+ */
+const __rootMeanSquaredError = (yTrue, yPred) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let result = wasm.rootMeanSquaredError(yTruePtr, yPredPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+
+  return result;
+};
+
+/**
+ * A JS wrapper of meanAbsoluteError for testing
+ * @param {[number]} yTrue True values
+ * @param {[number]} yPred Predicted values
+ * @returns {number} score
+ */
+const __meanAbsoluteError = (yTrue, yPred) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let result = wasm.meanAbsoluteError(yTruePtr, yPredPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+
+  return result;
+};
+
+/**
+ * A JS wrapper of meanAbsoluteError for testing
+ * @param {[number]} yTrue True values
+ * @param {[number]} yScore Predicted scores
+ * @returns {number} score
+ */
+const __countByThreshold = (yTrue, yScore) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let result = wasm.countByThreshold(yTruePtr, yPredPtr);
+
+  // Unpack the pointer
+  result = __getArray(result);
+  result = result.map((d) => __getArray(d));
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+
+  return result;
+};
+
+const __getROCCurve = (yTrue, yScore) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
+
+  let result = wasm.getROCCurve(countResult);
+  // Unpack the pointer
+  result = __getArray(result);
+  result = result.map((d) => __getArray(d));
+  return result;
+};
+
 module.exports = wasmModule.exports;
 
 // Add new functions
 module.exports.__searchSortedLowerIndex = __searchSortedLowerIndex;
 module.exports.__meanAbsoluteError = __meanAbsoluteError;
 module.exports.__rootMeanSquaredError = __rootMeanSquaredError;
+module.exports.__countByThreshold = __countByThreshold;
+module.exports.__getROCCurve = __getROCCurve;
 module.exports.EBM = EBM;

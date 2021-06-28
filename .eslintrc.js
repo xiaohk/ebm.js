@@ -33,7 +33,8 @@ module.exports = {
     'no-floating-decimal': 'off',
     'import/no-anonymous-default-export': 'off',
     'promise/catch-or-return': 'off',
-    '@shopify/prefer-early-return': 'off'
+    '@shopify/prefer-early-return': 'off',
+    'no-array-constructor': 'off'
   },
   root: true,
   globals: {

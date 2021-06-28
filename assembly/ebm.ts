@@ -5,6 +5,7 @@
  */
 
 import { console } from 'as-console';
+import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve } from './metrics';
 
 /**
  * Find the lower bound of a pair between where inserting `value` into `sorted`
@@ -243,22 +244,6 @@ export class __EBM {
     return output;
   }
 
-  // computeRMSE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-  //   let SESum = 0.0;
-  //   for (let i = 0; i < yTrue.length; i++) {
-  //     SESum += (yPred[i] - yTrue[i]) ** 2;
-  //   }
-  //   return Math.sqrt(SESum / yTrue.length);
-  // }
-
-  // computeMAE(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-  //   let AESum = 0.0;
-  //   for (let i = 0; i < yTrue.length; i++) {
-  //     AESum += Math.abs(yTrue[i] - yPred[i]);
-  //   }
-  //   return AESum / yTrue.length;
-  // }
-
   printName(): string {
     trace('editing', 1, this.editingFeatureIndex);
     return this.featureTypes[this.editingFeatureIndex];
@@ -266,21 +251,8 @@ export class __EBM {
 
 }
 
-export function rootMeanSquaredError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-  let SESum = 0.0;
-  for (let i = 0; i < yTrue.length; i++) {
-    SESum += (yPred[i] - yTrue[i]) ** 2;
-  }
-  return Math.sqrt(SESum / yTrue.length);
-}
-
-export function meanAbsoluteError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
-  let AESum = 0.0;
-  for (let i = 0; i < yTrue.length; i++) {
-    AESum += Math.abs(yTrue[i] - yPred[i]);
-  }
-  return AESum / yTrue.length;
-}
+// Export the metrics functions to JS for testing
+export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve };
 
 // We need unique array id so we can allocate them in JS
 export const Int32Array_ID = idof<Array<i32>>();
