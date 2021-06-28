@@ -11,6 +11,6 @@ require('./searchSortedLowerIndex.test');
 require('./metrics.test');
 
 // --- Testing EBM class ---
-// require('./ebm.test');
+require('./ebm.test');
 
 console.log('\nPassed all the tests!');

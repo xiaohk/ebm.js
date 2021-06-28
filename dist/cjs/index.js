@@ -83,6 +83,9 @@ class EBM {
 
   constructor(featureData, sampleData, editingFeature, isClassification) {
 
+    // Store values for JS object
+    this.isClassification = isClassification;
+
     /**
      * Pre-process the feature data
      *
@@ -268,8 +271,92 @@ class EBM {
     __unpin(changedScoresPtr);
   }
 
-  returnMetrics() {
-    let metrics = __getArray(this.ebm.returnMetrics());
+  getMetrics() {
+
+    /**
+     * (1) regression: [[[RMSE, MAE]]]
+     * (2) binary classification: [roc 2D points, PR 2D points, [confusion matrix 1D],
+     *  [[accuracy, roc auc, average precision]]]
+     */
+
+    // Unpack the return value from getMetrics()
+    let metrics = {};
+    if (!this.isClassification) {
+      let result3D = __getArray(this.ebm.getMetrics());
+      let result3DPtr = __pin(result3D);
+
+      let result2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.rmse = result1D[0];
+      metrics.mae = result1D[1];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+      __unpin(result3DPtr);
+    } else {
+      // Unpack ROC curves
+      let result3D = __getArray(this.ebm.getMetrics());
+      let result3DPtr = __pin(result3D);
+
+      let result1DPtrs = [];
+      let roc2D = __getArray(result3D[0].map(d => {
+        let point = __getArray(d);
+        result1DPtrs.push(__pin(point));
+        return point;
+      }));
+      let result2DPtr = __pin(roc2D);
+
+      metrics.rocCurve = roc2D;
+      result1DPtrs.map(d => __unpin(d));
+      __unpin(result2DPtr);
+
+      // Unpack PR curves
+      result1DPtrs = [];
+      let pr2D = __getArray(result3D[1].map(d => {
+        let point = __getArray(d);
+        result1DPtrs.push(__pin(point));
+        return point;
+      }));
+      result2DPtr = __pin(roc2D);
+
+      metrics.prCurve = pr2D;
+      result1DPtrs.map(d => __unpin(d));
+      __unpin(result2DPtr);
+
+      // Unpack confusion matrix
+      let result2D = __getArray(result3D[2]);
+      result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.confusionMatrix = result1D;
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+
+      // Unpack summary statistics
+      result2D = __getArray(result3D[3]);
+      result2DPtr = __pin(result2D);
+
+      result1D = __getArray(result2D[0]);
+      result1DPtr = __pin(result1D);
+
+      metrics.accuracy = result1D[0];
+      metrics.rocAuc = result1D[1];
+      metrics.averagePrecision = result1D[2];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+
+      __unpin(result3DPtr);
+    }
+
+    // let metrics = __getArray(this.ebm.getMetrics());
     return metrics;
   }
 }
@@ -433,6 +520,35 @@ const __getAveragePrecision = (yTrue, yScore) => {
   return averagePrecision;
 };
 
+const __getAccuracy = (yTrue, yProb) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let accuracy = wasm.getAccuracy(yTruePtr, yPredPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  return accuracy;
+};
+
+const __getConfusionMatrix = (yTrue, yProb) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let confusionMatrix = __getArray(wasm.getConfusionMatrix(yTruePtr, yPredPtr));
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  return confusionMatrix;
+};
+
+
 module.exports = wasmModule.exports;
 
 // Add new functions
@@ -444,4 +560,6 @@ module.exports.__getROCCurve = __getROCCurve;
 module.exports.__getPRCurve = __getPRCurve;
 module.exports.__getROCAuc = __getROCAuc;
 module.exports.__getAveragePrecision = __getAveragePrecision;
+module.exports.__getAccuracy = __getAccuracy;
+module.exports.__getConfusionMatrix = __getConfusionMatrix;
 module.exports.EBM = EBM;

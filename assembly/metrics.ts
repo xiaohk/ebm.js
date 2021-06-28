@@ -227,3 +227,35 @@ export function getAveragePrecision(prPoints: Array<Array<f64>>): f64 {
   }
   return averagePrecision;
 }
+
+export function getAccuracy(yTrue: Array<f64>, yProb: Array<f64>): f64 {
+  let correctNum = 0.0;
+  for (let i = 0; i < yTrue.length; i++) {
+    let curLabel = yProb[i] >= 0.5 ? 1.0 : 0.0;
+    if (curLabel == yTrue[i]) {
+      correctNum++;
+    }
+  }
+  return correctNum / yTrue.length;
+}
+
+export function getConfusionMatrix(yTrue: Array<f64>, yProb: Array<f64>, threshold: f64 = 0.5): Array<f64> {
+  let confusionMatrix = [0.0, 0.0, 0.0, 0.0];
+
+  for (let i = 0; i < yTrue.length; i++) {
+    let curLabel = yProb[i] >= threshold ? 1.0 : 0.0;
+    if (curLabel == 1) {
+      if (curLabel == yTrue[i]) {
+        confusionMatrix[3]++;
+      } else {
+        confusionMatrix[1]++;
+      }
+    } else if (curLabel == yTrue[i]) {
+      confusionMatrix[0]++;
+    } else {
+      confusionMatrix[2]++;
+    }
+  }
+
+  return confusionMatrix;
+}

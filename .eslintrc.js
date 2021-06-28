@@ -36,6 +36,7 @@ module.exports = {
     '@shopify/prefer-early-return': 'off',
     'no-array-constructor': 'off',
     'arrow-parens': 'off',
+    'no-negated-condition': 'off'
   },
   root: true,
   globals: {

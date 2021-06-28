@@ -184,6 +184,21 @@ utils.unitTestAssert(
   (t, r) => assert(t - r < 1e-6)
 );
 
+let y2Prob = y2.map(d => Math.exp(d) / (1 + Math.exp(d)));
 
-console.log(myModule.__getAveragePrecision(y1, y2));
+utils.unitTestAssert(
+  'Compute accuracy score',
+  () => myModule.__getAccuracy(y1, y2Prob),
+  0.76,
+  (t, r) => assert(t - r < 1e-6)
+);
+
+utils.unitTestAssert(
+  'Compute confusion matrix',
+  () => myModule.__getConfusionMatrix(y1, y2Prob),
+  [17, 7, 5, 21],
+  (t, r) => assert1dCloseTo(t, r, 1e-6)
+);
+
+console.log(myModule.__getConfusionMatrix(y1, y2Prob));
 

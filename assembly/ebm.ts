@@ -6,7 +6,7 @@
 
 import { console } from 'as-console';
 import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision
+  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix
 } from './metrics';
 
 /**
@@ -233,13 +233,42 @@ export class __EBM {
     }
   }
 
-  returnMetrics(): Array<f64> {
-    let output = new Array<f64>();
+  getMetrics(): Array<Array<Array<f64>>> {
+    let output = new Array<Array<Array<f64>>>();
 
     if (!this.isClassification) {
-      output.push(rootMeanSquaredError(this.labels, this.predLabels));
-      output.push(meanAbsoluteError(this.labels, this.predLabels));
+      let curResult = new Array<f64>();
+      curResult.push(rootMeanSquaredError(this.labels, this.predLabels));
+      curResult.push(meanAbsoluteError(this.labels, this.predLabels));
+      output.push([curResult]);
     } else {
+      // Convert the logits into probabilities
+      let predProbs = new Array<f64>(this.predLabels.length);
+      for (let i = 0; i < this.predLabels.length; i++) {
+        let curOdd = Math.exp(this.predLabels[i]);
+        predProbs[i] = curOdd / (curOdd + 1);
+      }
+
+      // Compute ROC curves and PR curves
+      let countResult = countByThreshold(this.labels, predProbs);
+      let rocPoints = getROCCurve(countResult);
+      let prPoints = getPRCurve(countResult);
+
+      output.push(rocPoints);
+      output.push(prPoints);
+
+      // Compute confusion matrix
+      let confusionMatrix = getConfusionMatrix(this.labels, predProbs);
+
+      output.push([confusionMatrix]);
+
+      // Compute summary statistics
+      let rocAuc = getROCAuc(rocPoints);
+      let averagePrecision = getAveragePrecision(prPoints);
+      let accuracy = getAccuracy(this.labels, predProbs);
+
+      output.push([[accuracy, rocAuc, averagePrecision]]);
+
       return output;
     }
 
@@ -255,7 +284,7 @@ export class __EBM {
 
 // Export the metrics functions to JS for testing
 export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision
+  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix
 };
 
 // We need unique array id so we can allocate them in JS

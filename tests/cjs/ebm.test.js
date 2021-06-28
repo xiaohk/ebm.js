@@ -57,10 +57,17 @@ const testEBM = async () => {
   ebm = new myModule.EBM(featureData, sampleData, 'LotFrontage', false);
 
   utils.unitTestAssert(
-    'EBM initial continuous metrics',
-    () => ebm.returnMetrics(),
-    [20235.34250608404, 14167.224581441791],
-    (t, r) => assert1dCloseTo(t, r, 1e-4)
+    'EBM initial continuous metrics RMSE',
+    () => ebm.getMetrics().rmse,
+    20235.34250608404,
+    (t, r) => assert(Math.abs(t - r) < 1e-4)
+  );
+
+  utils.unitTestAssert(
+    'EBM initial continuous metrics MAE',
+    () => ebm.getMetrics().mae,
+    14167.224581441791,
+    (t, r) => assert(Math.abs(t - r) < 1e-4)
   );
 
 };
