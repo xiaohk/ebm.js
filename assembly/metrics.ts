@@ -216,7 +216,7 @@ export function getPRCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64>
  */
 export function getROCAuc(rocPoints: Array<Array<f64>>): f64 {
   // Reverse the array, so x is decreasing
-  let rocPointsReverse = rocPoints.reverse();
+  let rocPointsReverse = rocPoints.slice(0).reverse();
 
   // Use Trapezoidal rule to approximate area under the curve
   let trapeArea = 0.0;
@@ -240,7 +240,7 @@ export function getAveragePrecision(prPoints: Array<Array<f64>>): f64 {
   let averagePrecision = 0.0;
 
   // Reverse the array, so recall is decreasing
-  let prPointsReverse = prPoints.reverse();
+  let prPointsReverse = prPoints.slice(0).reverse();
   for (let i = 0; i < prPointsReverse.length - 1; i++) {
     averagePrecision += (prPointsReverse[i][1] - prPointsReverse[i + 1][1]) *
       prPointsReverse[i][0];

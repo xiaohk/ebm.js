@@ -101,8 +101,6 @@ expected = [
   [1.0, 1.0]
 ];
 
-// console.log(myModule.__getROCCurve(y1, y2));
-
 utils.unitTestAssert(
   'Compute ROC Curve',
   () => myModule.__getROCCurve(y1, y2),
@@ -185,6 +183,4 @@ utils.unitTestAssert(
   [17, 7, 5, 21],
   (t, r) => assert1dCloseTo(t, r, 1e-6)
 );
-
-console.log(myModule.__getConfusionMatrix(y1, y2Prob));
 
