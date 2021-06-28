@@ -170,5 +170,20 @@ utils.unitTestAssert(
   (t, r) => assert2dCloseTo(t, r, 1e-6)
 );
 
+utils.unitTestAssert(
+  'Compute ROC AUC score',
+  () => myModule.__getROCAuc(y1, y2),
+  0.8469551282051283,
+  (t, r) => assert(t - r < 1e-6)
+);
 
+utils.unitTestAssert(
+  'Compute average precision score',
+  () => myModule.__getAveragePrecision(y1, y2),
+  0.8739271779969812,
+  (t, r) => assert(t - r < 1e-6)
+);
+
+
+console.log(myModule.__getAveragePrecision(y1, y2));
 

@@ -123,7 +123,7 @@ export function countByThreshold(yTrue: Array<f64>, yScore: Array<f64>): Array<A
 /**
  * Function to get ROC Curve points.
  *
- * @returns array of points (x is fpr, y is tpr)
+ * @returns array of points (point[0] is tpr, point[1] is fpr)
  */
 export function getROCCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64>> {
   // Get threshold along with TPs and FPs
@@ -156,10 +156,9 @@ export function getROCCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64
 /**
  * Function to get precision-recall Curve points.
  *
- * @param {[int]} yTrue array of true labels
- * @param {[float]} yScore array of prediction scores
+ * @param thresholdResult Results from counting the FPs and TPs
  *
- * @returns array of points (x is recall, y is precision)
+ * @returns array of points ([0] is precision, [1] is recall)
  */
 export function getPRCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64>> {
   // Get threshold along with TPs and FPs
@@ -187,4 +186,44 @@ export function getPRCurve(thresholdResult: Array<Array<f64>>): Array<Array<f64>
   }
 
   return prPoints;
+}
+
+/**
+ * Compute area under the ROC curve. Only using trapezoidal
+ * approximation (no interested region correction).
+ *
+ * @param rocPoints Points on the ROC curve
+ */
+export function getROCAuc(rocPoints: Array<Array<f64>>): f64 {
+  // Reverse the array, so x is decreasing
+  let rocPointsReverse = rocPoints.reverse();
+
+  // Use Trapezoidal rule to approximate area under the curve
+  let trapeArea = 0.0;
+
+  for (let i = 0; i < rocPointsReverse.length - 1; i++) {
+    trapeArea += (rocPointsReverse[i][1] - rocPointsReverse[i + 1][1]) *
+      (rocPointsReverse[i][0] + rocPointsReverse[i + 1][0]) / 2.0;
+  }
+
+  return trapeArea;
+}
+
+/**
+ * Function to compute average precision.
+ *
+ * @param prPoints Points on the precision recall curve
+ */
+export function getAveragePrecision(prPoints: Array<Array<f64>>): f64 {
+  // Compute average precision
+  // AP = ∑_n (R_n - R_{n-1}) * P_n
+  let averagePrecision = 0.0;
+
+  // Reverse the array, so recall is decreasing
+  let prPointsReverse = prPoints.reverse();
+  for (let i = 0; i < prPointsReverse.length - 1; i++) {
+    averagePrecision += (prPointsReverse[i][1] - prPointsReverse[i + 1][1]) *
+      prPointsReverse[i][0];
+  }
+  return averagePrecision;
 }

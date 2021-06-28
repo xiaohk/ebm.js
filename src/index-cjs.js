@@ -385,6 +385,52 @@ const __getPRCurve = (yTrue, yScore) => {
   return result;
 };
 
+const __getROCAuc = (yTrue, yScore) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
+  __pin(countResult);
+
+  let result = wasm.getROCCurve(countResult);
+  __pin(result);
+
+  let roc = wasm.getROCAuc(result);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  __unpin(countResult);
+  __unpin(result);
+
+  return roc;
+};
+
+const __getAveragePrecision = (yTrue, yScore) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
+  __pin(countResult);
+
+  let result = wasm.getPRCurve(countResult);
+  __pin(result);
+
+  let averagePrecision = wasm.getAveragePrecision(result);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  __unpin(countResult);
+  __unpin(result);
+
+  return averagePrecision;
+};
+
 module.exports = wasmModule.exports;
 
 // Add new functions
@@ -394,4 +440,6 @@ module.exports.__rootMeanSquaredError = __rootMeanSquaredError;
 module.exports.__countByThreshold = __countByThreshold;
 module.exports.__getROCCurve = __getROCCurve;
 module.exports.__getPRCurve = __getPRCurve;
+module.exports.__getROCAuc = __getROCAuc;
+module.exports.__getAveragePrecision = __getAveragePrecision;
 module.exports.EBM = EBM;

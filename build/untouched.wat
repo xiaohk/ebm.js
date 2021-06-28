@@ -4,6 +4,7 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $none_=>_none (func))
@@ -11,7 +12,6 @@
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_f64_=>_none (func (param i32 f64)))
  (type $i32_i32_f64_=>_none (func (param i32 i32 f64)))
- (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $i32_i32_i32_i32_i32_f64_i32_i32_i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32 f64 i32 i32 i32 i32 i32 i32 i32) (result i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_f64_i32_i32_=>_i32 (func (param i32 f64 i32 i32) (result i32)))
@@ -162,6 +162,8 @@
  (export "countByThreshold" (func $export:assembly/metrics/countByThreshold))
  (export "getROCCurve" (func $export:assembly/metrics/getROCCurve))
  (export "getPRCurve" (func $export:assembly/metrics/getPRCurve))
+ (export "getROCAuc" (func $export:assembly/metrics/getROCAuc))
+ (export "getAveragePrecision" (func $export:assembly/metrics/getAveragePrecision))
  (start $~start)
  (func $~lib/array/Array<f64>#get:length (param $0 i32) (result i32)
   local.get $0
@@ -10572,6 +10574,193 @@
   global.set $~lib/memory/__stack_pointer
   local.get $9
  )
+ (func $assembly/metrics/getROCAuc (param $0 i32) (result f64)
+  (local $1 i32)
+  (local $2 f64)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  call $~lib/array/Array<~lib/array/Array<f64>>#reverse
+  local.tee $1
+  i32.store
+  f64.const 0
+  local.set $2
+  i32.const 0
+  local.set $3
+  loop $for-loop|0
+   local.get $3
+   local.get $1
+   call $~lib/array/Array<~lib/array/Array<f64>>#get:length
+   i32.const 1
+   i32.sub
+   i32.lt_s
+   local.set $4
+   local.get $4
+   if
+    local.get $2
+    local.get $1
+    local.get $3
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 1
+    call $~lib/array/Array<f64>#__get
+    local.get $1
+    local.get $3
+    i32.const 1
+    i32.add
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 1
+    call $~lib/array/Array<f64>#__get
+    f64.sub
+    local.get $1
+    local.get $3
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 0
+    call $~lib/array/Array<f64>#__get
+    local.get $1
+    local.get $3
+    i32.const 1
+    i32.add
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 0
+    call $~lib/array/Array<f64>#__get
+    f64.add
+    f64.mul
+    f64.const 2
+    f64.div
+    f64.add
+    local.set $2
+    local.get $3
+    i32.const 1
+    i32.add
+    local.set $3
+    br $for-loop|0
+   end
+  end
+  local.get $2
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $6
+ )
+ (func $assembly/metrics/getAveragePrecision (param $0 i32) (result f64)
+  (local $1 f64)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  f64.const 0
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  call $~lib/array/Array<~lib/array/Array<f64>>#reverse
+  local.tee $2
+  i32.store
+  i32.const 0
+  local.set $3
+  loop $for-loop|0
+   local.get $3
+   local.get $2
+   call $~lib/array/Array<~lib/array/Array<f64>>#get:length
+   i32.const 1
+   i32.sub
+   i32.lt_s
+   local.set $4
+   local.get $4
+   if
+    local.get $1
+    local.get $2
+    local.get $3
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 1
+    call $~lib/array/Array<f64>#__get
+    local.get $2
+    local.get $3
+    i32.const 1
+    i32.add
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 1
+    call $~lib/array/Array<f64>#__get
+    f64.sub
+    local.get $2
+    local.get $3
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $5
+    global.get $~lib/memory/__stack_pointer
+    local.get $5
+    i32.store offset=4
+    local.get $5
+    i32.const 0
+    call $~lib/array/Array<f64>#__get
+    f64.mul
+    f64.add
+    local.set $1
+    local.get $3
+    i32.const 1
+    i32.add
+    local.set $3
+    br $for-loop|0
+   end
+  end
+  local.get $1
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $6
+ )
  (func $~lib/array/Array<f64>#constructor (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
@@ -11992,6 +12181,77 @@
   global.set $~lib/memory/__stack_pointer
   local.get $9
  )
+ (func $~lib/array/Array<~lib/array/Array<f64>>#reverse (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.load offset=12
+  local.set $1
+  local.get $1
+  if
+   local.get $0
+   i32.load offset=4
+   local.set $2
+   local.get $0
+   i32.load offset=4
+   local.get $1
+   i32.const 1
+   i32.sub
+   i32.const 2
+   i32.shl
+   i32.add
+   local.set $3
+   loop $while-continue|0
+    local.get $2
+    local.get $3
+    i32.lt_u
+    local.set $4
+    local.get $4
+    if
+     global.get $~lib/memory/__stack_pointer
+     local.get $2
+     i32.load
+     local.tee $5
+     i32.store
+     local.get $2
+     local.get $3
+     i32.load
+     i32.store
+     local.get $3
+     local.get $5
+     i32.store
+     local.get $2
+     i32.const 4
+     i32.add
+     local.set $2
+     local.get $3
+     i32.const 4
+     i32.sub
+     local.set $3
+     br $while-continue|0
+    end
+   end
+  end
+  local.get $0
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $6
+ )
  (func $export:assembly/ebm/searchSortedLowerIndex (param $0 i32) (param $1 f64) (result i32)
   (local $2 i32)
   global.get $~lib/memory/__stack_pointer
@@ -12793,6 +13053,44 @@
   i32.store
   local.get $0
   call $assembly/metrics/getPRCurve
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/metrics/getROCAuc (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/metrics/getROCAuc
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
+ )
+ (func $export:assembly/metrics/getAveragePrecision (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/metrics/getAveragePrecision
   local.set $1
   global.get $~lib/memory/__stack_pointer
   i32.const 4
