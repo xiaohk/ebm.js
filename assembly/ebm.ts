@@ -33,7 +33,7 @@ export function searchSortedLowerIndex(sorted: Array<f64>, value: f64): i32 {
   }
 
   // Handle out of bound issue
-  if (value > sorted[right]) {
+  if (value >= sorted[right]) {
     return right;
   }
   if (value < sorted[left]) {
@@ -248,6 +248,71 @@ export class __EBM {
           this.predProbs[s] = sigmoid(this.predLabels[s]);
         }
       }
+    }
+  }
+
+  /**
+   * Overwrite the bin definition and scores of the current editing feature.
+   * @param newBinEdges New bin edges.
+   * @param newScores New bin scores.
+   */
+  setModel(newBinEdges: Array<f64>, newScores: Array<f64>): void {
+
+    // Step 1: Remove the effect of this feature from logits (re-compute prob later)
+    for (let b = 0; b < this.binEdges[this.editingFeatureIndex].length; b++) {
+      let affectedSampleIDs = this.editingFeatureSampleMap[b];
+      let curBinScore = this.scores[this.editingFeatureIndex][b];
+
+      for (let i = 0; i < affectedSampleIDs.length; i++) {
+        let s = affectedSampleIDs[i];
+        this.predLabels[s] -= curBinScore;
+      }
+    }
+
+    // Step 2: overwrite the bin edges and scores
+    this.binEdges[this.editingFeatureIndex] = newBinEdges;
+    this.scores[this.editingFeatureIndex] = newScores;
+
+    // Step 3: Re-indexing the sample IDs & Add the new score to logits
+    this.editingFeatureSampleMap = new Array<Array<i32>>(newBinEdges.length);
+
+    // Initialize the editing feature map
+    for (let b = 0; b < newBinEdges.length; b++) {
+      this.editingFeatureSampleMap[b] = new Array<i32>();
+    }
+
+    for (let s = 0; s < this.samples.length; s++) {
+      let curFeature = this.samples[s][this.editingFeatureIndex];
+
+      // Use the feature value to find the corresponding bin
+      let binIndex: i32;
+      let binScore: f64;
+
+      if (this.featureTypes[this.editingFeatureIndex] == 'continuous') {
+        binIndex = searchSortedLowerIndex(newBinEdges, curFeature);
+        binScore = newScores[binIndex];
+      } else {
+        binIndex = newBinEdges.indexOf(curFeature);
+        if (binIndex < 0) {
+          // Unseen level during training => use 0 as score instead
+          console.log(`>> Unseen feature: ${this.featureNames[this.editingFeatureIndex]}, ${s}, ${curFeature}`);
+          binScore = 0
+        } else {
+          binScore = newScores[binIndex];
+        }
+      }
+
+      // Add the new score to logits
+      this.predLabels[s] += binScore;
+
+      // Update the prob if it is a classifier
+      if (this.isClassification) {
+        this.predProbs[s] = sigmoid(this.predLabels[s]);
+      }
+
+      // Track the sample ID in the index
+      // console.log([s, binIndex, curFeature]);
+      this.editingFeatureSampleMap[binIndex].push(s);
     }
   }
 

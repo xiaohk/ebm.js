@@ -66,3 +66,23 @@ unitTestEqual(
   expected
 );
 
+sorted = [2, 6, 8, 9, 10, 20];
+value = 20;
+expected = 5;
+
+unitTestEqual(
+  'searchSortedLowerIndex [on the bound at right]',
+  () => myModule.__searchSortedLowerIndex(sorted, value),
+  expected
+);
+
+sorted = [2006.0, 2006.5, 2007.5, 2008.5, 2009.5];
+value = 2010;
+expected = 4;
+
+unitTestEqual(
+  'searchSortedLowerIndex [on the bound at right] 2',
+  () => myModule.__searchSortedLowerIndex(sorted, value),
+  expected
+);
+

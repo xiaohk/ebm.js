@@ -166,8 +166,22 @@ class EBM {
         interactionIndexes.push(curIndexesPtr);
 
         // Collect two bin edges
-        let binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1);
-        let binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2);
+        let binEdge1Ptr;
+        let binEdge2Ptr;
+
+        // Have to skip the max edge if it is continuous
+        if (sampleData.featureTypes[index1] === 'categorical') {
+          binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice());
+        } else {
+          binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice(0, -1));
+        }
+
+        if (sampleData.featureTypes[index2] === 'categorical') {
+          binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice());
+        } else {
+          binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1));
+        }
+
         __pin(binEdge1Ptr);
         __pin(binEdge2Ptr);
 
@@ -262,6 +276,10 @@ class EBM {
     return predProbs;
   }
 
+  getScore() {
+    return __getArray(this.ebm.predLabels);
+  }
+
   getPrediction() {
     if (this.isClassification) {
       let predProbs = __getArray(this.ebm.getPrediction());
@@ -281,6 +299,19 @@ class EBM {
 
     __unpin(changedBinIndexesPtr);
     __unpin(changedScoresPtr);
+  }
+
+  setModel(newBinEdges, newScores) {
+    let newBinEdgesPtr = __newArray(wasm.Float64Array_ID, newBinEdges);
+    let newScoresPtr = __newArray(wasm.Float64Array_ID, newScores);
+
+    __pin(newBinEdgesPtr);
+    __pin(newScoresPtr);
+
+    this.ebm.setModel(newBinEdgesPtr, newScoresPtr);
+
+    __unpin(newBinEdgesPtr);
+    __unpin(newScoresPtr);
   }
 
   getMetrics() {
