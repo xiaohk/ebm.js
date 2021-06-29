@@ -169,19 +169,16 @@ class EBM {
 
         // Have to skip the max edge if it is continuous
         if (sampleData.featureTypes[index1] === 'categorical') {
-          binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice());
+          binEdge1Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel1.slice()));
         } else {
-          binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice(0, -1));
+          binEdge1Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel1.slice(0, -1)));
         }
 
         if (sampleData.featureTypes[index2] === 'categorical') {
-          binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice());
+          binEdge2Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel2.slice()));
         } else {
-          binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1));
+          binEdge2Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1)));
         }
-
-        __pin(binEdge1Ptr);
-        __pin(binEdge2Ptr);
 
         let curBinEdgesPtr = __newArray(wasm.Float64Array2D_ID, [binEdge1Ptr, binEdge2Ptr]);
         __pin(curBinEdgesPtr);
@@ -201,13 +198,9 @@ class EBM {
     });
 
     // Create 3D arrays
-    let interactionIndexesPtr = __newArray(wasm.Int32Array2D_ID, interactionIndexes);
-    let interactionBinEdgesPtr = __newArray(wasm.Float64Array3D_ID, interactionBinEdges);
-    let interactionScoresPtr = __newArray(wasm.Float64Array3D_ID, interactionScores);
-
-    __pin(interactionIndexesPtr);
-    __pin(interactionBinEdgesPtr);
-    __pin(interactionScoresPtr);
+    let interactionIndexesPtr = __pin(__newArray(wasm.Int32Array2D_ID, interactionIndexes));
+    let interactionBinEdgesPtr = __pin(__newArray(wasm.Float64Array3D_ID, interactionBinEdges));
+    let interactionScoresPtr = __pin(__newArray(wasm.Float64Array3D_ID, interactionScores));
 
     /**
      * Step 3: Pass the sample data to WASM. We directly transfer this 2D float

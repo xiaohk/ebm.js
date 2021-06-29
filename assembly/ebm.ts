@@ -155,7 +155,7 @@ export class __EBM {
           binIndex = this.binEdges[j].indexOf(curFeature);
           if (binIndex < 0) {
             // Unseen level during training => use 0 as score instead
-            console.log(`>> Unseen feature: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
+            console.log(`[WASM] Unseen categorical level: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
             binScore = 0
           } else {
             binScore = this.scores[j][binIndex];

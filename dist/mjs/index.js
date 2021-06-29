@@ -502,9 +502,10 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
      * @returns Pointer to the array of string pointers
      */
     const __createStringArray = (strings) => {
-      let stringPtr = strings.map((n) => __newString(n));
-      let stringArrayPtr = __newArray(wasm.StringArray_ID, stringPtr);
-      __pin(stringArrayPtr);
+      let stringPtrs = strings.map(str => __pin(__newString(str)));
+      let stringArrayPtr = __pin(__newArray(wasm.StringArray_ID, stringPtrs));
+      stringPtrs.forEach(ptr => __unpin(ptr));
+
       return stringArrayPtr;
     };
 
@@ -538,6 +539,9 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
       ebm;
 
       constructor(featureData, sampleData, editingFeature, isClassification) {
+
+        // Store values for JS object
+        this.isClassification = isClassification;
 
         /**
          * Pre-process the feature data
@@ -624,19 +628,16 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
 
             // Have to skip the max edge if it is continuous
             if (sampleData.featureTypes[index1] === 'categorical') {
-              binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice());
+              binEdge1Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel1.slice()));
             } else {
-              binEdge1Ptr = __newArray(wasm.Float64Array_ID, d.binLabel1.slice(0, -1));
+              binEdge1Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel1.slice(0, -1)));
             }
 
             if (sampleData.featureTypes[index2] === 'categorical') {
-              binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice());
+              binEdge2Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel2.slice()));
             } else {
-              binEdge2Ptr = __newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1));
+              binEdge2Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1)));
             }
-
-            __pin(binEdge1Ptr);
-            __pin(binEdge2Ptr);
 
             let curBinEdgesPtr = __newArray(wasm.Float64Array2D_ID, [binEdge1Ptr, binEdge2Ptr]);
             __pin(curBinEdgesPtr);
@@ -656,13 +657,9 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
         });
 
         // Create 3D arrays
-        let interactionIndexesPtr = __newArray(wasm.Int32Array2D_ID, interactionIndexes);
-        let interactionBinEdgesPtr = __newArray(wasm.Float64Array3D_ID, interactionBinEdges);
-        let interactionScoresPtr = __newArray(wasm.Float64Array3D_ID, interactionScores);
-
-        __pin(interactionIndexesPtr);
-        __pin(interactionBinEdgesPtr);
-        __pin(interactionScoresPtr);
+        let interactionIndexesPtr = __pin(__newArray(wasm.Int32Array2D_ID, interactionIndexes));
+        let interactionBinEdgesPtr = __pin(__newArray(wasm.Float64Array3D_ID, interactionBinEdges));
+        let interactionScoresPtr = __pin(__newArray(wasm.Float64Array3D_ID, interactionScores));
 
         /**
          * Step 3: Pass the sample data to WASM. We directly transfer this 2D float
@@ -713,16 +710,32 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
         __unpin(featureNamesPtr);
       }
 
-      printData() {
+      destroy() {
+        __unpin(this.ebm);
+        this.ebm = null;
+      }
 
+      printData() {
         let namePtr = this.ebm.printName();
         let name = __getString(namePtr);
         console.log('Editing: ', name);
+      }
 
+      getProb() {
+        let predProbs = __getArray(this.ebm.getPrediction());
+        return predProbs;
+      }
+
+      getScore() {
+        return __getArray(this.ebm.predLabels);
       }
 
       getPrediction() {
-        return __getArray(this.ebm.predLabels);
+        if (this.isClassification) {
+          let predProbs = __getArray(this.ebm.getPrediction());
+          return predProbs.map(d => (d >= 0.5 ? 1 : 0));
+        }
+        return __getArray(this.ebm.getPrediction());
       }
 
       updateModel(changedBinIndexes, changedScores) {
@@ -738,39 +751,110 @@ const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) 
         __unpin(changedScoresPtr);
       }
 
-      returnMetrics() {
-        let metrics = __getArray(this.ebm.returnMetrics());
+      setModel(newBinEdges, newScores) {
+        let newBinEdgesPtr = __newArray(wasm.Float64Array_ID, newBinEdges);
+        let newScoresPtr = __newArray(wasm.Float64Array_ID, newScores);
+
+        __pin(newBinEdgesPtr);
+        __pin(newScoresPtr);
+
+        this.ebm.setModel(newBinEdgesPtr, newScoresPtr);
+
+        __unpin(newBinEdgesPtr);
+        __unpin(newScoresPtr);
+      }
+
+      getMetrics() {
+
+        /**
+         * (1) regression: [[[RMSE, MAE]]]
+         * (2) binary classification: [roc 2D points, PR 2D points, [confusion matrix 1D],
+         *  [[accuracy, roc auc, average precision]]]
+         */
+
+        // Unpack the return value from getMetrics()
+        let metrics = {};
+        if (!this.isClassification) {
+          let result3D = __getArray(this.ebm.getMetrics());
+          let result3DPtr = __pin(result3D);
+
+          let result2D = __getArray(result3D[0]);
+          let result2DPtr = __pin(result2D);
+
+          let result1D = __getArray(result2D[0]);
+          let result1DPtr = __pin(result1D);
+
+          metrics.rmse = result1D[0];
+          metrics.mae = result1D[1];
+
+          __unpin(result1DPtr);
+          __unpin(result2DPtr);
+          __unpin(result3DPtr);
+        } else {
+          // Unpack ROC curves
+          let result3D = __getArray(this.ebm.getMetrics());
+          let result3DPtr = __pin(result3D);
+
+          let result1DPtrs = [];
+          let roc2D = __getArray(result3D[0]);
+          let result2DPtr = __pin(roc2D);
+
+          let rocPoints = roc2D.map(d => {
+            let point = __getArray(d);
+            result1DPtrs.push(__pin(point));
+            return point;
+          });
+
+          metrics.rocCurve = rocPoints;
+          result1DPtrs.map(d => __unpin(d));
+          __unpin(result2DPtr);
+
+          // Unpack PR curves
+          result1DPtrs = [];
+          let pr2D = __getArray(result3D[1]);
+          result2DPtr = __pin(roc2D);
+
+          let prPoints = pr2D.map(d => {
+            let point = __getArray(d);
+            result1DPtrs.push(__pin(point));
+            return point;
+          });
+
+          metrics.prCurve = prPoints;
+          result1DPtrs.map(d => __unpin(d));
+          __unpin(result2DPtr);
+
+          // Unpack confusion matrix
+          let result2D = __getArray(result3D[2]);
+          result2DPtr = __pin(result2D);
+
+          let result1D = __getArray(result2D[0]);
+          let result1DPtr = __pin(result1D);
+
+          metrics.confusionMatrix = result1D;
+
+          __unpin(result1DPtr);
+          __unpin(result2DPtr);
+
+          // Unpack summary statistics
+          result2D = __getArray(result3D[3]);
+          result2DPtr = __pin(result2D);
+
+          result1D = __getArray(result2D[0]);
+          result1DPtr = __pin(result1D);
+
+          metrics.accuracy = result1D[0];
+          metrics.rocAuc = result1D[1];
+          metrics.averagePrecision = result1D[2];
+
+          __unpin(result1DPtr);
+          __unpin(result2DPtr);
+
+          __unpin(result3DPtr);
+        }
+
+        // let metrics = __getArray(this.ebm.getMetrics());
         return metrics;
-      }
-
-      __computeRMSE(yTrue, yPred) {
-        let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-        let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-        __pin(yTruePtr);
-        __pin(yPredPtr);
-
-        let result = this.ebm.computeRMSE(yTruePtr, yPredPtr);
-
-        __unpin(yTruePtr);
-        __unpin(yPredPtr);
-
-        return result;
-      }
-
-      __computeMAE(yTrue, yPred) {
-        let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-        let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-        __pin(yTruePtr);
-        __pin(yPredPtr);
-
-        let result = this.ebm.computeMAE(yTruePtr, yPredPtr);
-
-        __unpin(yTruePtr);
-        __unpin(yPredPtr);
-
-        return result;
       }
     }
 
