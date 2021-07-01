@@ -219,6 +219,20 @@ export class __EBM {
 
   }
 
+  /**
+   * Compute the number of test samples in the given bins
+   * @param binIndexes Bin indexes of a interested region
+   */
+  getSelectedSampleNum(binIndexes: Array<i32>): i32 {
+    let count = 0;
+
+    for (let i = 0; i < binIndexes.length; i++) {
+      count += this.editingFeatureSampleMap[binIndexes[i]].length;
+    }
+
+    return count;
+  }
+
   updateModel(changedBinIndexes: Array<i32>, changedScores: Array<f64>): void {
     // Update the bin scores
     let scoreDiffs = new Array<f64>(changedScores.length);
@@ -334,13 +348,13 @@ export class __EBM {
       curResult.push(meanAbsoluteError(this.labels, this.predLabels));
       output.push([curResult]);
     } else {
-      // Compute ROC curves and PR curves
+      // Compute ROC curves
       let countResult = countByThreshold(this.labels, this.predProbs);
       let rocPoints = getROCCurve(countResult);
-      let prPoints = getPRCurve(countResult);
+      // let prPoints = getPRCurve(countResult);
 
       output.push(rocPoints);
-      output.push(prPoints);
+      // output.push(prPoints);
 
       // Compute confusion matrix
       let confusionMatrix = getConfusionMatrix(this.labels, this.predProbs);
@@ -349,10 +363,11 @@ export class __EBM {
 
       // Compute summary statistics
       let rocAuc = getROCAuc(rocPoints);
-      let averagePrecision = getAveragePrecision(prPoints);
+      // let averagePrecision = getAveragePrecision(prPoints);
       let accuracy = getAccuracy(this.labels, this.predProbs);
+      let balancedAccuracy = getBalancedAccuracy(confusionMatrix);
 
-      output.push([[accuracy, rocAuc, averagePrecision]]);
+      output.push([[accuracy, rocAuc, balancedAccuracy]]);
 
       return output;
     }

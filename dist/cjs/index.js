@@ -281,6 +281,13 @@ class EBM {
     return __getArray(this.ebm.getPrediction());
   }
 
+  getSelectedSampleNum(binIndexes) {
+    let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
+    let count = this.ebm.getSelectedSampleNum(binIndexesPtr);
+    __unpin(binIndexesPtr);
+    return count;
+  }
+
   updateModel(changedBinIndexes, changedScores) {
     let changedBinIndexesPtr = __newArray(wasm.Float64Array_ID, changedBinIndexes);
     let changedScoresPtr = __newArray(wasm.Float64Array_ID, changedScores);
@@ -311,8 +318,8 @@ class EBM {
 
     /**
      * (1) regression: [[[RMSE, MAE]]]
-     * (2) binary classification: [roc 2D points, PR 2D points, [confusion matrix 1D],
-     *  [[accuracy, roc auc, average precision]]]
+     * (2) binary classification: [roc 2D points, [confusion matrix 1D],
+     *  [[accuracy, roc auc, balanced accuracy]]]
      */
 
     // Unpack the return value from getMetrics()
@@ -353,22 +360,22 @@ class EBM {
       __unpin(result2DPtr);
 
       // Unpack PR curves
-      result1DPtrs = [];
-      let pr2D = __getArray(result3D[1]);
-      result2DPtr = __pin(roc2D);
+      // result1DPtrs = [];
+      // let pr2D = __getArray(result3D[1]);
+      // result2DPtr = __pin(roc2D);
 
-      let prPoints = pr2D.map(d => {
-        let point = __getArray(d);
-        result1DPtrs.push(__pin(point));
-        return point;
-      });
+      // let prPoints = pr2D.map(d => {
+      //   let point = __getArray(d);
+      //   result1DPtrs.push(__pin(point));
+      //   return point;
+      // });
 
-      metrics.prCurve = prPoints;
-      result1DPtrs.map(d => __unpin(d));
-      __unpin(result2DPtr);
+      // metrics.prCurve = prPoints;
+      // result1DPtrs.map(d => __unpin(d));
+      // __unpin(result2DPtr);
 
       // Unpack confusion matrix
-      let result2D = __getArray(result3D[2]);
+      let result2D = __getArray(result3D[1]);
       result2DPtr = __pin(result2D);
 
       let result1D = __getArray(result2D[0]);
@@ -380,7 +387,7 @@ class EBM {
       __unpin(result2DPtr);
 
       // Unpack summary statistics
-      result2D = __getArray(result3D[3]);
+      result2D = __getArray(result3D[2]);
       result2DPtr = __pin(result2D);
 
       result1D = __getArray(result2D[0]);
@@ -388,7 +395,7 @@ class EBM {
 
       metrics.accuracy = result1D[0];
       metrics.rocAuc = result1D[1];
-      metrics.averagePrecision = result1D[2];
+      metrics.balancedAccuracy = result1D[2];
 
       __unpin(result1DPtr);
       __unpin(result2DPtr);

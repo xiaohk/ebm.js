@@ -206,9 +206,9 @@ const testEBMClassifier = async () => {
     'EBM initial summary statistics',
     () => {
       let metrics = ebm.getMetrics();
-      return [metrics.accuracy, metrics.rocAuc, metrics.averagePrecision];
+      return [metrics.accuracy, metrics.rocAuc, metrics.balancedAccuracy];
     },
-    [0.9680365296803652, 0.9897173845030764, 0.9847073740939531],
+    [0.9680365296803652, 0.9897173845030764, 0.967942434039003],
     (t, r) => assert1dCloseTo(t, r, 1e-6)
   );
 
@@ -519,14 +519,27 @@ const testEBMClassifier = async () => {
     [0.892, 1.0]
   ];
 
+  // utils.unitTestAssert(
+  //   'EBM PR curve',
+  //   () => {
+  //     let metrics = ebm.getMetrics();
+  //     return metrics.prCurve;
+  //   },
+  //   expectedPred,
+  //   (t, r) => assert2dCloseTo(t, r, 1e-2)
+  // );
+
   utils.unitTestAssert(
-    'EBM PR curve',
-    () => {
-      let metrics = ebm.getMetrics();
-      return metrics.prCurve;
-    },
-    expectedPred,
-    (t, r) => assert2dCloseTo(t, r, 1e-2)
+    'EBM get selected sample number',
+    () => [
+      ebm.getSelectedSampleNum([0, 1, 2, 3]),
+      ebm.getSelectedSampleNum([0, 11, 22, 33]),
+      ebm.getSelectedSampleNum([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+      ebm.getSelectedSampleNum([98]),
+      ebm.getSelectedSampleNum([0])
+    ],
+    [90, 88, 102, 2, 76],
+    (t, r) => assert1dCloseTo(t, r, 1e-6)
   );
 
   expectedPred = [
@@ -686,9 +699,9 @@ const testEBMClassifier = async () => {
     'EBM updated statistics',
     () => {
       let metrics = ebm.getMetrics();
-      return [metrics.accuracy, metrics.rocAuc, metrics.averagePrecision];
+      return [metrics.accuracy, metrics.rocAuc, metrics.balancedAccuracy];
     },
-    [0.9223744292237442, 0.9811867765147564, 0.979173689640954],
+    [0.9223744292237442, 0.9811867765147564, 0.9213473772030452],
     (t, r) => assert1dCloseTo(t, r, 0.01)
   );
 

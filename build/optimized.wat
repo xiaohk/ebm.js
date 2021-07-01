@@ -5,8 +5,8 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
- (type $none_=>_none (func))
  (type $i32_=>_f64 (func (param i32) (result f64)))
+ (type $none_=>_none (func))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
@@ -108,13 +108,13 @@
  (data (i32.const 3576) "\0d\00\00\00\08\00\00\00\01")
  (data (i32.const 3596) ",")
  (data (i32.const 3612) "\10")
- (data (i32.const 3644) ",")
- (data (i32.const 3660) "\10")
- (data (i32.const 3670) "\f0?")
- (data (i32.const 3692) "<")
- (data (i32.const 3708) " ")
+ (data (i32.const 3644) "<")
+ (data (i32.const 3660) " ")
+ (data (i32.const 3708) ",")
+ (data (i32.const 3720) "\01\00\00\00\0e\00\00\00e\00d\00i\00t\00i\00n\00g")
  (data (i32.const 3756) ",")
- (data (i32.const 3768) "\01\00\00\00\0e\00\00\00e\00d\00i\00t\00i\00n\00g")
+ (data (i32.const 3772) "\10")
+ (data (i32.const 3782) "\f0?")
  (data (i32.const 3804) "<")
  (data (i32.const 3816) "\01\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d")
  (data (i32.const 3868) "<")
@@ -171,6 +171,7 @@
  (export "__EBM#get:editingFeatureSampleMap" (func $export:assembly/ebm/__EBM#get:editingFeatureSampleMap))
  (export "__EBM#set:editingFeatureSampleMap" (func $export:assembly/ebm/__EBM#set:editingFeatureSampleMap))
  (export "__EBM#constructor" (func $export:assembly/ebm/__EBM#constructor))
+ (export "__EBM#getSelectedSampleNum" (func $export:assembly/ebm/__EBM#getSelectedSampleNum))
  (export "__EBM#updateModel" (func $export:assembly/ebm/__EBM#updateModel))
  (export "__EBM#updatePredictionPartial" (func $export:assembly/ebm/__EBM#updatePredictionPartial))
  (export "__EBM#setModel" (func $export:assembly/ebm/__EBM#setModel))
@@ -186,6 +187,7 @@
  (export "getAveragePrecision" (func $export:assembly/metrics/getAveragePrecision))
  (export "getAccuracy" (func $export:assembly/metrics/getAccuracy))
  (export "getConfusionMatrix" (func $export:assembly/metrics/getConfusionMatrix@varargs))
+ (export "getBalancedAccuracy" (func $export:assembly/metrics/getBalancedAccuracy))
  (start $~start)
  (func $~lib/array/Array<f64>#__get (param $0 i32) (param $1 i32) (result f64)
   local.get $1
@@ -4479,6 +4481,33 @@
   f64.convert_i32_s
   f64.div
  )
+ (func $assembly/metrics/getBalancedAccuracy (param $0 i32) (result f64)
+  local.get $0
+  i32.const 3
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 3
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 2
+  call $~lib/array/Array<f64>#__get
+  f64.add
+  f64.div
+  local.get $0
+  i32.const 0
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 0
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 1
+  call $~lib/array/Array<f64>#__get
+  f64.add
+  f64.div
+  f64.add
+  f64.const 0.5
+  f64.mul
+ )
  (func $~lib/rt/itcms/__pin (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
@@ -7148,142 +7177,6 @@
   global.set $~lib/memory/__stack_pointer
   local.get $0
  )
- (func $assembly/metrics/getPRCurve (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 f64)
-  (local $5 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 28
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=16
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=24
-  global.get $~lib/memory/__stack_pointer
-  local.get $0
-  i32.const 0
-  call $~lib/array/Array<~lib/array/Array<f64>>#__get
-  local.tee $5
-  i32.store
-  global.get $~lib/memory/__stack_pointer
-  local.get $0
-  i32.const 1
-  call $~lib/array/Array<~lib/array/Array<f64>>#__get
-  local.tee $1
-  i32.store offset=4
-  local.get $1
-  local.get $1
-  i32.load offset=12
-  i32.const 1
-  i32.sub
-  call $~lib/array/Array<f64>#__get
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  global.get $~lib/memory/__stack_pointer
-  i32.const 1
-  i32.const 2
-  i32.const 6
-  i32.const 0
-  call $~lib/rt/__newArray
-  local.tee $2
-  i32.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.load offset=4
-  i32.store offset=12
-  local.get $2
-  i32.const 0
-  i32.const 2
-  i32.const 3
-  i32.const 5
-  i32.const 3664
-  call $~lib/rt/__newArray
-  call $~lib/array/Array<~lib/array/Array<i32>>#__uset
-  local.get $2
-  i32.store offset=12
-  i32.const 0
-  local.set $0
-  loop $for-loop|0
-   local.get $0
-   local.get $1
-   i32.load offset=12
-   i32.lt_s
-   if
-    block $for-break0
-     global.get $~lib/memory/__stack_pointer
-     i32.const 2
-     i32.const 3
-     i32.const 5
-     i32.const 0
-     call $~lib/rt/__newArray
-     local.tee $3
-     i32.store offset=20
-     global.get $~lib/memory/__stack_pointer
-     local.get $3
-     i32.load offset=4
-     i32.store offset=24
-     local.get $3
-     i32.const 0
-     local.get $1
-     local.get $0
-     call $~lib/array/Array<f64>#__get
-     local.get $1
-     local.get $0
-     call $~lib/array/Array<f64>#__get
-     local.get $5
-     local.get $0
-     call $~lib/array/Array<f64>#__get
-     f64.add
-     f64.div
-     call $~lib/array/Array<f64>#__uset
-     local.get $3
-     i32.const 1
-     local.get $1
-     local.get $0
-     call $~lib/array/Array<f64>#__get
-     local.get $4
-     f64.div
-     call $~lib/array/Array<f64>#__uset
-     global.get $~lib/memory/__stack_pointer
-     local.get $3
-     i32.store offset=16
-     local.get $2
-     local.get $3
-     call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-     local.get $1
-     local.get $0
-     call $~lib/array/Array<f64>#__get
-     local.get $4
-     f64.div
-     f64.const 1
-     f64.eq
-     br_if $for-break0
-     local.get $0
-     i32.const 1
-     i32.add
-     local.set $0
-     br $for-loop|0
-    end
-   end
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 28
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $2
- )
  (func $assembly/metrics/getROCAuc (param $0 i32) (result f64)
   (local $1 i32)
   (local $2 i32)
@@ -7384,6 +7277,427 @@
   global.set $~lib/memory/__stack_pointer
   local.get $5
  )
+ (func $assembly/ebm/__EBM#getMetrics (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 f64)
+  (local $6 f64)
+  (local $7 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 40
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=16
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=24
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=32
+  global.get $~lib/memory/__stack_pointer
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.const 7
+  call $~lib/rt/itcms/__new
+  local.tee $2
+  i32.store
+  local.get $2
+  i32.const 0
+  call $assembly/ebm/__EBM#set:featureNames
+  local.get $2
+  i32.const 0
+  i32.store offset=4
+  local.get $2
+  i32.const 0
+  i32.store offset=8
+  local.get $2
+  i32.const 0
+  i32.store offset=12
+  global.get $~lib/memory/__stack_pointer
+  i32.const 32
+  i32.const 0
+  call $~lib/rt/itcms/__new
+  local.tee $1
+  i32.store offset=4
+  local.get $1
+  i32.const 32
+  call $~lib/memory/memory.fill
+  local.get $2
+  local.get $1
+  call $assembly/ebm/__EBM#set:featureNames
+  local.get $2
+  local.get $1
+  i32.store offset=4
+  local.get $2
+  i32.const 32
+  i32.store offset=8
+  local.get $2
+  i32.const 0
+  i32.store offset=12
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $0
+  i32.load8_u offset=48
+  if
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=40
+   local.tee $1
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=56
+   local.tee $3
+   i32.store offset=12
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   local.get $3
+   call $assembly/metrics/countByThreshold
+   local.tee $1
+   i32.store offset=4
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   call $assembly/metrics/getROCCurve
+   local.tee $3
+   i32.store offset=20
+   local.get $2
+   local.get $3
+   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=40
+   local.tee $1
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=56
+   local.tee $4
+   i32.store offset=12
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   local.get $4
+   f64.const 0.5
+   call $assembly/metrics/getConfusionMatrix
+   local.tee $4
+   i32.store offset=16
+   global.get $~lib/memory/__stack_pointer
+   i32.const 1
+   i32.const 2
+   i32.const 6
+   i32.const 0
+   call $~lib/rt/__newArray
+   local.tee $1
+   i32.store offset=24
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   i32.load offset=4
+   i32.store offset=28
+   local.get $1
+   i32.const 0
+   local.get $4
+   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   i32.store offset=12
+   local.get $2
+   local.get $1
+   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
+   local.get $3
+   call $assembly/metrics/getROCAuc
+   local.set $5
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=40
+   local.tee $1
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=56
+   local.tee $0
+   i32.store offset=12
+   local.get $1
+   local.get $0
+   call $assembly/metrics/getAccuracy
+   local.set $6
+   local.get $4
+   call $assembly/metrics/getBalancedAccuracy
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   i32.const 1
+   i32.const 2
+   i32.const 6
+   i32.const 0
+   call $~lib/rt/__newArray
+   local.tee $1
+   i32.store offset=28
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   i32.load offset=4
+   i32.store offset=24
+   global.get $~lib/memory/__stack_pointer
+   i32.const 3
+   i32.const 3
+   i32.const 5
+   i32.const 0
+   call $~lib/rt/__newArray
+   local.tee $0
+   i32.store offset=32
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=4
+   i32.store offset=36
+   local.get $0
+   i32.const 0
+   local.get $6
+   call $~lib/array/Array<f64>#__uset
+   local.get $0
+   i32.const 1
+   local.get $5
+   call $~lib/array/Array<f64>#__uset
+   local.get $0
+   i32.const 2
+   local.get $7
+   call $~lib/array/Array<f64>#__uset
+   local.get $1
+   i32.const 0
+   local.get $0
+   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
+   global.get $~lib/memory/__stack_pointer
+   local.get $1
+   i32.store offset=12
+   local.get $2
+   local.get $1
+   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
+   global.get $~lib/memory/__stack_pointer
+   i32.const 40
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   local.get $2
+   return
+  else
+   global.get $~lib/memory/__stack_pointer
+   i32.const 0
+   call $~lib/array/Array<f64>#constructor
+   local.tee $1
+   i32.store offset=4
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=40
+   local.tee $3
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=52
+   local.tee $4
+   i32.store offset=12
+   local.get $1
+   local.get $3
+   local.get $4
+   call $assembly/metrics/rootMeanSquaredError
+   call $~lib/array/Array<f64>#push
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=40
+   local.tee $3
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=52
+   local.tee $0
+   i32.store offset=12
+   local.get $1
+   local.get $3
+   local.get $0
+   call $assembly/metrics/meanAbsoluteError
+   call $~lib/array/Array<f64>#push
+   global.get $~lib/memory/__stack_pointer
+   i32.const 1
+   i32.const 2
+   i32.const 6
+   i32.const 0
+   call $~lib/rt/__newArray
+   local.tee $0
+   i32.store offset=16
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=4
+   i32.store offset=20
+   local.get $0
+   i32.const 0
+   local.get $1
+   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.store offset=12
+   local.get $2
+   local.get $0
+   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 40
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+ )
+ (func $assembly/metrics/getPRCurve (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 f64)
+  (local $5 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=16
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=24
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.const 0
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.tee $5
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.const 1
+  call $~lib/array/Array<~lib/array/Array<f64>>#__get
+  local.tee $1
+  i32.store offset=4
+  local.get $1
+  local.get $1
+  i32.load offset=12
+  i32.const 1
+  i32.sub
+  call $~lib/array/Array<f64>#__get
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  global.get $~lib/memory/__stack_pointer
+  i32.const 1
+  i32.const 2
+  i32.const 6
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.tee $2
+  i32.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.load offset=4
+  i32.store offset=12
+  local.get $2
+  i32.const 0
+  i32.const 2
+  i32.const 3
+  i32.const 5
+  i32.const 3776
+  call $~lib/rt/__newArray
+  call $~lib/array/Array<~lib/array/Array<i32>>#__uset
+  local.get $2
+  i32.store offset=12
+  i32.const 0
+  local.set $0
+  loop $for-loop|0
+   local.get $0
+   local.get $1
+   i32.load offset=12
+   i32.lt_s
+   if
+    block $for-break0
+     global.get $~lib/memory/__stack_pointer
+     i32.const 2
+     i32.const 3
+     i32.const 5
+     i32.const 0
+     call $~lib/rt/__newArray
+     local.tee $3
+     i32.store offset=20
+     global.get $~lib/memory/__stack_pointer
+     local.get $3
+     i32.load offset=4
+     i32.store offset=24
+     local.get $3
+     i32.const 0
+     local.get $1
+     local.get $0
+     call $~lib/array/Array<f64>#__get
+     local.get $1
+     local.get $0
+     call $~lib/array/Array<f64>#__get
+     local.get $5
+     local.get $0
+     call $~lib/array/Array<f64>#__get
+     f64.add
+     f64.div
+     call $~lib/array/Array<f64>#__uset
+     local.get $3
+     i32.const 1
+     local.get $1
+     local.get $0
+     call $~lib/array/Array<f64>#__get
+     local.get $4
+     f64.div
+     call $~lib/array/Array<f64>#__uset
+     global.get $~lib/memory/__stack_pointer
+     local.get $3
+     i32.store offset=16
+     local.get $2
+     local.get $3
+     call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
+     local.get $1
+     local.get $0
+     call $~lib/array/Array<f64>#__get
+     local.get $4
+     f64.div
+     f64.const 1
+     f64.eq
+     br_if $for-break0
+     local.get $0
+     i32.const 1
+     i32.add
+     local.set $0
+     br $for-loop|0
+    end
+   end
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+ )
  (func $assembly/metrics/getAveragePrecision (param $0 i32) (result f64)
   (local $1 i32)
   (local $2 i32)
@@ -7467,303 +7781,6 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $5
- )
- (func $assembly/ebm/__EBM#getMetrics (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 f64)
-  (local $7 f64)
-  (local $8 f64)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 44
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=16
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=24
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=32
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=40
-  global.get $~lib/memory/__stack_pointer
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.const 7
-  call $~lib/rt/itcms/__new
-  local.tee $2
-  i32.store
-  local.get $2
-  i32.const 0
-  call $assembly/ebm/__EBM#set:featureNames
-  local.get $2
-  i32.const 0
-  i32.store offset=4
-  local.get $2
-  i32.const 0
-  i32.store offset=8
-  local.get $2
-  i32.const 0
-  i32.store offset=12
-  global.get $~lib/memory/__stack_pointer
-  i32.const 32
-  i32.const 0
-  call $~lib/rt/itcms/__new
-  local.tee $1
-  i32.store offset=4
-  local.get $1
-  i32.const 32
-  call $~lib/memory/memory.fill
-  local.get $2
-  local.get $1
-  call $assembly/ebm/__EBM#set:featureNames
-  local.get $2
-  local.get $1
-  i32.store offset=4
-  local.get $2
-  i32.const 32
-  i32.store offset=8
-  local.get $2
-  i32.const 0
-  i32.store offset=12
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $0
-  i32.load8_u offset=48
-  if
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=40
-   local.tee $1
-   i32.store offset=8
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=56
-   local.tee $3
-   i32.store offset=12
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   local.get $3
-   call $assembly/metrics/countByThreshold
-   local.tee $1
-   i32.store offset=4
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   call $assembly/metrics/getROCCurve
-   local.tee $3
-   i32.store offset=20
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   call $assembly/metrics/getPRCurve
-   local.tee $4
-   i32.store offset=16
-   local.get $2
-   local.get $3
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   local.get $2
-   local.get $4
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=40
-   local.tee $1
-   i32.store offset=8
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=56
-   local.tee $5
-   i32.store offset=12
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   local.get $5
-   f64.const 0.5
-   call $assembly/metrics/getConfusionMatrix
-   local.tee $5
-   i32.store offset=24
-   global.get $~lib/memory/__stack_pointer
-   i32.const 1
-   i32.const 2
-   i32.const 6
-   i32.const 0
-   call $~lib/rt/__newArray
-   local.tee $1
-   i32.store offset=28
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   i32.load offset=4
-   i32.store offset=32
-   local.get $1
-   i32.const 0
-   local.get $5
-   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   i32.store offset=12
-   local.get $2
-   local.get $1
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   local.get $3
-   call $assembly/metrics/getROCAuc
-   local.set $6
-   local.get $4
-   call $assembly/metrics/getAveragePrecision
-   local.set $7
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=40
-   local.tee $1
-   i32.store offset=8
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=56
-   local.tee $0
-   i32.store offset=12
-   local.get $1
-   local.get $0
-   call $assembly/metrics/getAccuracy
-   local.set $8
-   global.get $~lib/memory/__stack_pointer
-   i32.const 1
-   i32.const 2
-   i32.const 6
-   i32.const 0
-   call $~lib/rt/__newArray
-   local.tee $1
-   i32.store offset=32
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   i32.load offset=4
-   i32.store offset=28
-   global.get $~lib/memory/__stack_pointer
-   i32.const 3
-   i32.const 3
-   i32.const 5
-   i32.const 0
-   call $~lib/rt/__newArray
-   local.tee $0
-   i32.store offset=36
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=4
-   i32.store offset=40
-   local.get $0
-   i32.const 0
-   local.get $8
-   call $~lib/array/Array<f64>#__uset
-   local.get $0
-   i32.const 1
-   local.get $6
-   call $~lib/array/Array<f64>#__uset
-   local.get $0
-   i32.const 2
-   local.get $7
-   call $~lib/array/Array<f64>#__uset
-   local.get $1
-   i32.const 0
-   local.get $0
-   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
-   global.get $~lib/memory/__stack_pointer
-   local.get $1
-   i32.store offset=12
-   local.get $2
-   local.get $1
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   global.get $~lib/memory/__stack_pointer
-   i32.const 44
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $2
-   return
-  else
-   global.get $~lib/memory/__stack_pointer
-   i32.const 0
-   call $~lib/array/Array<f64>#constructor
-   local.tee $1
-   i32.store offset=4
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=40
-   local.tee $3
-   i32.store offset=8
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=52
-   local.tee $4
-   i32.store offset=12
-   local.get $1
-   local.get $3
-   local.get $4
-   call $assembly/metrics/rootMeanSquaredError
-   call $~lib/array/Array<f64>#push
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=40
-   local.tee $3
-   i32.store offset=8
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=52
-   local.tee $0
-   i32.store offset=12
-   local.get $1
-   local.get $3
-   local.get $0
-   call $assembly/metrics/meanAbsoluteError
-   call $~lib/array/Array<f64>#push
-   global.get $~lib/memory/__stack_pointer
-   i32.const 1
-   i32.const 2
-   i32.const 6
-   i32.const 0
-   call $~lib/rt/__newArray
-   local.tee $0
-   i32.store offset=16
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.load offset=4
-   i32.store offset=20
-   local.get $0
-   i32.const 0
-   local.get $1
-   call $~lib/array/Array<~lib/array/Array<i32>>#__uset
-   global.get $~lib/memory/__stack_pointer
-   local.get $0
-   i32.store offset=12
-   local.get $2
-   local.get $0
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 44
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $2
  )
  (func $~lib/array/Array<f64>#constructor (param $0 i32) (result i32)
   (local $1 i32)
@@ -8182,7 +8199,7 @@
   i32.const 4
   i32.const 3
   i32.const 5
-  i32.const 3712
+  i32.const 3664
   call $~lib/rt/__newArray
   local.tee $3
   i32.store
@@ -9021,6 +9038,71 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
+ (func $export:assembly/ebm/__EBM#getSelectedSampleNum (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  loop $for-loop|0
+   local.get $2
+   local.get $1
+   i32.load offset=12
+   i32.lt_s
+   if
+    global.get $~lib/memory/__stack_pointer
+    local.get $0
+    i32.load offset=60
+    local.tee $3
+    i32.store offset=4
+    local.get $3
+    local.get $1
+    local.get $2
+    call $~lib/array/Array<i32>#__get
+    call $~lib/array/Array<~lib/array/Array<f64>>#__get
+    local.set $3
+    global.get $~lib/memory/__stack_pointer
+    local.get $3
+    i32.store
+    local.get $4
+    local.get $3
+    i32.load offset=12
+    i32.add
+    local.set $4
+    local.get $2
+    i32.const 1
+    i32.add
+    local.set $2
+    br $for-loop|0
+   end
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $4
+ )
  (func $export:assembly/ebm/__EBM#updateModel (param $0 i32) (param $1 i32) (param $2 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 12
@@ -9151,9 +9233,9 @@
   i32.const 0
   i32.store
   global.get $~lib/memory/__stack_pointer
-  i32.const 3776
+  i32.const 3728
   i32.store
-  i32.const 3776
+  i32.const 3728
   i32.const 1
   local.get $0
   i32.load offset=44
@@ -9361,6 +9443,23 @@
   call $assembly/metrics/getConfusionMatrix
   global.get $~lib/memory/__stack_pointer
   i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/metrics/getBalancedAccuracy (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/metrics/getBalancedAccuracy
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
