@@ -588,6 +588,23 @@ const __getConfusionMatrix = (yTrue, yProb) => {
   return confusionMatrix;
 };
 
+const __getBalancedAccuracy = (yTrue, yProb) => {
+  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
+  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
+
+  __pin(yTruePtr);
+  __pin(yPredPtr);
+
+  let confusionMatrixPtr = __pin((wasm.getConfusionMatrix(yTruePtr, yPredPtr)));
+
+  let accuracy = wasm.getBalancedAccuracy(confusionMatrixPtr);
+
+  __unpin(yTruePtr);
+  __unpin(yPredPtr);
+  __unpin(confusionMatrixPtr);
+
+  return accuracy;
+};
 
 module.exports = wasmModule.exports;
 
@@ -602,4 +619,5 @@ module.exports.__getROCAuc = __getROCAuc;
 module.exports.__getAveragePrecision = __getAveragePrecision;
 module.exports.__getAccuracy = __getAccuracy;
 module.exports.__getConfusionMatrix = __getConfusionMatrix;
+module.exports.__getBalancedAccuracy = __getBalancedAccuracy;
 module.exports.EBM = EBM;

@@ -6,7 +6,8 @@
 
 import { console } from 'as-console';
 import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix
+  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix,
+  getBalancedAccuracy
 } from './metrics';
 
 /**
@@ -368,7 +369,8 @@ export class __EBM {
 
 // Export the metrics functions to JS for testing
 export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix
+  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix,
+  getBalancedAccuracy
 };
 
 // We need unique array id so we can allocate them in JS

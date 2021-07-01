@@ -248,6 +248,12 @@ export function getAveragePrecision(prPoints: Array<Array<f64>>): f64 {
   return averagePrecision;
 }
 
+/**
+ * Function to compute the accuracy score.
+ * @param yTrue True labels
+ * @param yProb Predicted scores
+ * @returns Accuracy score
+ */
 export function getAccuracy(yTrue: Array<f64>, yProb: Array<f64>): f64 {
   let correctNum = 0.0;
   for (let i = 0; i < yTrue.length; i++) {
@@ -259,6 +265,13 @@ export function getAccuracy(yTrue: Array<f64>, yProb: Array<f64>): f64 {
   return correctNum / yTrue.length;
 }
 
+/**
+ * Function to compute the confusion matrix.
+ * @param yTrue True labels
+ * @param yProb Predicted scores
+ * @param threshold Threshold to determine the positive prediction (default 0.5)
+ * @returns [tn, fp, fn, tp]
+ */
 export function getConfusionMatrix(yTrue: Array<f64>, yProb: Array<f64>, threshold: f64 = 0.5): Array<f64> {
   let confusionMatrix = [0.0, 0.0, 0.0, 0.0];
 
@@ -278,4 +291,20 @@ export function getConfusionMatrix(yTrue: Array<f64>, yProb: Array<f64>, thresho
   }
 
   return confusionMatrix;
+}
+
+/**
+ * Function to compute the balanced accuracy score (average of recalls on all classes)
+ * @param confusionMatrix [tn, fp, fn, tp]
+ * @returns balanced accuracy score
+ */
+export function getBalancedAccuracy(confusionMatrix: Array<f64>): f64 {
+
+  // Compute the recall of positive case
+  let recallP = confusionMatrix[3] / (confusionMatrix[3] + confusionMatrix[2]);
+
+  // Compute the recall of negative case
+  let recallN = confusionMatrix[0] / (confusionMatrix[0] + confusionMatrix[1]);
+
+  return (recallP + recallN) / 2;
 }

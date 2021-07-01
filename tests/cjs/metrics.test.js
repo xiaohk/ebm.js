@@ -158,14 +158,14 @@ utils.unitTestAssert(
   'Compute ROC AUC score',
   () => myModule.__getROCAuc(y1, y2),
   0.8469551282051283,
-  (t, r) => assert(t - r < 1e-6)
+  (t, r) => assert(Math.abs(t - r) < 1e-6)
 );
 
 utils.unitTestAssert(
   'Compute average precision score',
   () => myModule.__getAveragePrecision(y1, y2),
   0.8739271779969812,
-  (t, r) => assert(t - r < 1e-6)
+  (t, r) => assert(Math.abs(t - r) < 1e-6)
 );
 
 let y2Prob = y2.map(d => Math.exp(d) / (1 + Math.exp(d)));
@@ -174,7 +174,7 @@ utils.unitTestAssert(
   'Compute accuracy score',
   () => myModule.__getAccuracy(y1, y2Prob),
   0.76,
-  (t, r) => assert(t - r < 1e-6)
+  (t, r) => assert(Math.abs(t - r) < 1e-6)
 );
 
 utils.unitTestAssert(
@@ -182,5 +182,12 @@ utils.unitTestAssert(
   () => myModule.__getConfusionMatrix(y1, y2Prob),
   [17, 7, 5, 21],
   (t, r) => assert1dCloseTo(t, r, 1e-6)
+);
+
+utils.unitTestAssert(
+  'Balanced accuracy',
+  () => myModule.__getBalancedAccuracy(y1, y2Prob),
+  0.7580128205128205,
+  (t, r) => assert(Math.abs(t - r) < 1e-6)
 );
 

@@ -4,9 +4,9 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
- (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $none_=>_none (func))
  (type $i32_f64_=>_i32 (func (param i32 f64) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
@@ -176,6 +176,7 @@
  (export "getAveragePrecision" (func $export:assembly/metrics/getAveragePrecision))
  (export "getAccuracy" (func $export:assembly/metrics/getAccuracy))
  (export "getConfusionMatrix" (func $export:assembly/metrics/getConfusionMatrix@varargs))
+ (export "getBalancedAccuracy" (func $export:assembly/metrics/getBalancedAccuracy))
  (start $~start)
  (func $~lib/array/Array<f64>#get:length (param $0 i32) (result i32)
   local.get $0
@@ -8451,6 +8452,39 @@
   f64.convert_i32_s
   f64.div
  )
+ (func $assembly/metrics/getBalancedAccuracy (param $0 i32) (result f64)
+  (local $1 f64)
+  (local $2 f64)
+  local.get $0
+  i32.const 3
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 3
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 2
+  call $~lib/array/Array<f64>#__get
+  f64.add
+  f64.div
+  local.set $1
+  local.get $0
+  i32.const 0
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 0
+  call $~lib/array/Array<f64>#__get
+  local.get $0
+  i32.const 1
+  call $~lib/array/Array<f64>#__get
+  f64.add
+  f64.div
+  local.set $2
+  local.get $1
+  local.get $2
+  f64.add
+  f64.const 2
+  f64.div
+ )
  (func $assembly/metrics/getConfusionMatrix@varargs (param $0 i32) (param $1 i32) (param $2 f64) (result i32)
   block $1of1
    block $0of1
@@ -14965,5 +14999,24 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
   local.get $3
+ )
+ (func $export:assembly/metrics/getBalancedAccuracy (param $0 i32) (result f64)
+  (local $1 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  call $assembly/metrics/getBalancedAccuracy
+  local.set $1
+  global.get $~lib/memory/__stack_pointer
+  i32.const 4
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $1
  )
 )
