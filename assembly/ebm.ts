@@ -59,6 +59,7 @@ export class __EBM {
   // Feature bin edges and additive score
   binEdges: Array<Array<f64>>;
   scores: Array<Array<f64>>;
+  histBinEdges: Array<Array<f64>>;
   intercept: f64;
 
   // Bin edges and scores of interaction terms
@@ -79,6 +80,7 @@ export class __EBM {
   predLabels: Array<f64>;
   predProbs: Array<f64>;
   editingFeatureSampleMap: Array<Array<i32>>;
+  histBinCounts: Array<Array<i32>>;
 
   /**
    * 
@@ -98,6 +100,7 @@ export class __EBM {
     featureTypes: Array<string>,
     binEdges: Array<Array<f64>>,
     scores: Array<Array<f64>>,
+    histBinEdges: Array<Array<f64>>,
     intercept: f64,
     interactionIndexes: Array<Array<i32>>,
     interactionBinEdges: Array<Array<Array<f64>>>,
@@ -113,6 +116,7 @@ export class __EBM {
     this.featureTypes = featureTypes;
     this.binEdges = binEdges;
     this.scores = scores;
+    this.histBinEdges = histBinEdges;
     this.intercept = intercept;
     this.interactionIndexes = interactionIndexes;
     this.interactionBinEdges = interactionBinEdges;
@@ -126,15 +130,23 @@ export class __EBM {
      * Step 2: Iterate through the sample data to initialize
      * - Current prediction
      * - Editing feature's bin bucket info
+     * - Histogram counts
      */
     this.predLabels = new Array<f64>(this.labels.length).fill(this.intercept);
     this.predProbs = new Array<f64>(this.predLabels.length).fill(0.0);
 
     this.editingFeatureSampleMap = new Array<Array<i32>>(this.binEdges[this.editingFeatureIndex].length);
 
+    this.histBinCounts = new Array<Array<i32>>(this.histBinEdges.length);
+
     // Initialize the editing feature map
     for (let b = 0; b < this.binEdges[this.editingFeatureIndex].length; b++) {
       this.editingFeatureSampleMap[b] = new Array<i32>();
+    }
+
+    // Initialize the hist bin counts
+    for (let b = 0; b < this.binEdges.length; b++) {
+      this.histBinCounts[b] = new Array<i32>(this.histBinEdges[b].length).fill(0);
     }
 
     for (let i = 0; i < this.samples.length; i++) {
@@ -148,10 +160,12 @@ export class __EBM {
         // Use the feature value to find the corresponding bin
         let binIndex: i32;
         let binScore: f64;
+        let histBinIndex: i32;
 
         if (curFeatureType == 'continuous') {
           binIndex = searchSortedLowerIndex(this.binEdges[j], curFeature);
           binScore = this.scores[j][binIndex];
+          histBinIndex = searchSortedLowerIndex(this.histBinEdges[j], curFeature);
         } else {
           binIndex = this.binEdges[j].indexOf(curFeature);
           if (binIndex < 0) {
@@ -160,6 +174,13 @@ export class __EBM {
             binScore = 0
           } else {
             binScore = this.scores[j][binIndex];
+          }
+
+          histBinIndex = this.histBinEdges[j].indexOf(curFeature);
+          if (histBinIndex < 0) {
+            // Unseen level during training => use 0 as score instead
+            console.log(`[WASM] Unseen categorical level in histogram: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
+            histBinIndex = 0
           }
         }
 
@@ -171,6 +192,9 @@ export class __EBM {
         if (j == this.editingFeatureIndex) {
           this.editingFeatureSampleMap[binIndex].push(i);
         }
+
+        // Add the histogram count
+        this.histBinCounts[j][histBinIndex] ++;
       }
 
       // Add interaction effect scores
@@ -216,7 +240,6 @@ export class __EBM {
         this.predProbs[i] = sigmoid(this.predLabels[i]);
       }
     }
-
   }
 
   /**

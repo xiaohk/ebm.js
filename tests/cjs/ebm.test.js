@@ -912,6 +912,20 @@ const testEBMClassifier = async () => {
     (t, r) => assert1dCloseTo(t, r, 0.01)
   );
 
+  // Test hist bin count
+  let histBinCounts = ebm.getHistBinCounts();
+  let histBinCountsSum = histBinCounts.map(counts => counts.reduce((a, b) => a + b));
+  let expectedCounts = new Array(sampleData.featureNames.length).fill(sampleData.samples.length);
+
+  utils.unitTestAssert(
+    'EBM histogram counts',
+    () => {
+      return histBinCountsSum;
+    },
+    expectedCounts,
+    (t, r) => assert1dCloseTo(t, r, 1e-16)
+  );
+
 
   console.log('\n--- Finished testing EBM Classification ---\n');
 
