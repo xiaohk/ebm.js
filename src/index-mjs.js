@@ -285,6 +285,14 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
         return count;
       }
 
+      getSelectedSampleDist(binIndexes) {
+        let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
+        let histBinCounts = __getArray(this.ebm.getSelectedSampleDist(binIndexesPtr));
+        histBinCounts = histBinCounts.map(p => __getArray(p));
+        __unpin(binIndexesPtr);
+        return histBinCounts;
+      }
+
       getHistBinCounts() {
         let histBinCounts = __getArray(this.ebm.histBinCounts);
         histBinCounts = histBinCounts.map(p => __getArray(p));

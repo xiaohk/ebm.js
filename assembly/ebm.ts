@@ -256,6 +256,50 @@ export class __EBM {
     return count;
   }
 
+  /**
+   * Count the hist bin counts for each feature for each affected samples.
+   * @param binIndexes Bin indexes of a interested region
+   */
+  getSelectedSampleDist(binIndexes: Array<i32>): Array<Array<i32>> {
+    // Initialize bin counts
+    let binCounts = new Array<Array<i32>>(this.histBinEdges.length);
+    for (let b = 0; b < this.histBinEdges.length; b++) {
+      binCounts[b] = new Array<i32>(this.histBinEdges[b].length).fill(0);
+    }
+
+    // Iterate through all the affected samples
+    for (let i = 0; i < binIndexes.length; i++) {
+      let ids = this.editingFeatureSampleMap[binIndexes[i]];
+
+      for (let ids_i = 0; ids_i < ids.length; ids_i++) {
+        let s = ids[ids_i];
+
+        // Iterate through all features
+        for (let j = 0; j < this.histBinEdges.length; j++) {
+          let curFeatureType = this.featureTypes[j];
+          let curFeature = this.samples[s][j];
+          let histBinIndex: i32;
+
+          if (curFeatureType == 'continuous') {
+            histBinIndex = searchSortedLowerIndex(this.histBinEdges[j], curFeature);
+          } else {
+            histBinIndex = this.histBinEdges[j].indexOf(curFeature);
+            if (histBinIndex < 0) {
+              // Unseen level during training => use 0 as score instead
+              console.log(`[WASM] Unseen categorical level in histogram: ${s}, ${j}, ${curFeature}`);
+              histBinIndex = 0
+            }
+          }
+
+          // Update the count
+          binCounts[j][histBinIndex] ++;
+        }
+      }
+    }
+
+    return binCounts;
+  }
+
   updateModel(changedBinIndexes: Array<i32>, changedScores: Array<f64>): void {
     // Update the bin scores
     let scoreDiffs = new Array<f64>(changedScores.length);

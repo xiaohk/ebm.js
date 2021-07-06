@@ -305,6 +305,14 @@ class EBM {
     return count;
   }
 
+  getSelectedSampleDist(binIndexes) {
+    let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
+    let histBinCounts = __getArray(this.ebm.getSelectedSampleDist(binIndexesPtr));
+    histBinCounts = histBinCounts.map(p => __getArray(p));
+    __unpin(binIndexesPtr);
+    return histBinCounts;
+  }
+
   getHistBinCounts() {
     let histBinCounts = __getArray(this.ebm.histBinCounts);
     histBinCounts = histBinCounts.map(p => __getArray(p));
@@ -545,17 +553,11 @@ const __getPRCurve = (yTrue, yScore) => {
 };
 
 const __getROCAuc = (yTrue, yScore) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yScore));
 
-  __pin(yTruePtr);
-  __pin(yPredPtr);
-
-  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
-  __pin(countResult);
-
-  let result = wasm.getROCCurve(countResult);
-  __pin(result);
+  let countResult = __pin(wasm.countByThreshold(yTruePtr, yPredPtr));
+  let result = __pin(wasm.getROCCurve(countResult));
 
   let roc = wasm.getROCAuc(result);
 
@@ -568,17 +570,11 @@ const __getROCAuc = (yTrue, yScore) => {
 };
 
 const __getAveragePrecision = (yTrue, yScore) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yScore));
 
-  __pin(yTruePtr);
-  __pin(yPredPtr);
-
-  let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
-  __pin(countResult);
-
-  let result = wasm.getPRCurve(countResult);
-  __pin(result);
+  let countResult = __pin(wasm.countByThreshold(yTruePtr, yPredPtr));
+  let result = __pin(wasm.getPRCurve(countResult));
 
   let averagePrecision = wasm.getAveragePrecision(result);
 

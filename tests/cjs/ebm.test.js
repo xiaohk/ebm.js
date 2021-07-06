@@ -926,6 +926,22 @@ const testEBMClassifier = async () => {
     (t, r) => assert1dCloseTo(t, r, 1e-16)
   );
 
+  ebm = new myModule.EBM(featureData, sampleData, 'LotFrontage', true);
+
+  let selectedBins = [0, 1, 2, 3, 4, 5];
+  histBinCounts = ebm.getSelectedSampleDist(selectedBins);
+  let sampleCount = ebm.getSelectedSampleNum(selectedBins);
+  histBinCountsSum = histBinCounts.map(counts => counts.reduce((a, b) => a + b));
+  expectedCounts = new Array(sampleData.featureNames.length).fill(sampleCount);
+
+  utils.unitTestAssert(
+    'EBM selected histogram counts',
+    () => {
+      return histBinCountsSum;
+    },
+    expectedCounts,
+    (t, r) => assert1dCloseTo(t, r, 1e-16)
+  );
 
   console.log('\n--- Finished testing EBM Classification ---\n');
 
