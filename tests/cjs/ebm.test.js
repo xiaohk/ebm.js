@@ -955,7 +955,19 @@ const testEBMClassifier = async () => {
     (t, r) => assert1dCloseTo(t, r, 1e-16)
   );
 
-  ebm.setSliceData(29, 0);
+  ebm.setSliceData(29, 2);
+  histBinCounts = ebm.getHistBinCounts();
+  metrics = ebm.getMetricsOnSelectedSlice();
+  confusionMatrixSum = metrics.confusionMatrix.reduce((a, b) => a + b);
+
+  utils.unitTestAssert(
+    'EBM metrics on selected slice',
+    () => {
+      return [confusionMatrixSum];
+    },
+    [histBinCounts[29][2]],
+    (t, r) => assert1dCloseTo(t, r, 1e-16)
+  );
 
   console.log('\n--- Finished testing EBM Classification ---\n');
 
