@@ -191,3 +191,8 @@ utils.unitTestAssert(
   (t, r) => assert(Math.abs(t - r) < 1e-6)
 );
 
+// let y3 = [1, 0, 0];
+// let y4Prob = [0.001, 0.002, 0.002];
+// let y4Prob = [0, 0, 0];
+// console.log(myModule.__getROCAuc(y3, y4Prob));
+

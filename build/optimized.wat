@@ -6633,19 +6633,23 @@
   i32.const 0
   i32.store offset=8
   loop $for-loop|0
-   local.get $4
+   local.get $5
    local.get $1
    i32.load offset=12
    i32.lt_s
    if
+    local.get $1
+    local.get $5
+    call $~lib/array/Array<i32>#__get
+    local.set $3
     global.get $~lib/memory/__stack_pointer
     local.get $0
     i32.load offset=68
-    local.tee $3
+    local.tee $4
     i32.store
     global.get $~lib/memory/__stack_pointer
-    local.get $3
     local.get $4
+    local.get $3
     call $~lib/array/Array<~lib/array/Array<f64>>#__get
     local.tee $8
     i32.store offset=4
@@ -6660,7 +6664,7 @@
       local.get $8
       local.get $3
       call $~lib/array/Array<i32>#__get
-      local.set $5
+      local.set $4
       global.get $~lib/memory/__stack_pointer
       local.get $0
       i32.load offset=60
@@ -6672,12 +6676,12 @@
       local.tee $7
       i32.store offset=8
       local.get $6
-      local.get $5
+      local.get $4
       local.get $7
-      local.get $5
+      local.get $4
       call $~lib/array/Array<f64>#__get
       local.get $2
-      local.get $4
+      local.get $5
       call $~lib/array/Array<f64>#__get
       f64.add
       call $~lib/array/Array<f64>#__set
@@ -6695,9 +6699,9 @@
        local.tee $7
        i32.store offset=8
        local.get $6
-       local.get $5
+       local.get $4
        local.get $7
-       local.get $5
+       local.get $4
        call $~lib/array/Array<f64>#__get
        call $assembly/ebm/sigmoid
        call $~lib/array/Array<f64>#__set
@@ -6709,10 +6713,10 @@
       br $for-loop|1
      end
     end
-    local.get $4
+    local.get $5
     i32.const 1
     i32.add
-    local.set $4
+    local.set $5
     br $for-loop|0
    end
   end
@@ -6725,7 +6729,8 @@
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  (local $6 f64)
+  (local $6 i32)
+  (local $7 f64)
   global.get $~lib/memory/__stack_pointer
   i32.const 12
   i32.sub
@@ -6749,10 +6754,14 @@
    i32.load offset=12
    i32.lt_s
    if
+    local.get $1
+    local.get $4
+    call $~lib/array/Array<i32>#__get
+    local.set $6
     local.get $2
     local.get $4
     call $~lib/array/Array<f64>#__get
-    local.set $6
+    local.set $7
     global.get $~lib/memory/__stack_pointer
     local.get $0
     i32.load offset=12
@@ -6768,9 +6777,9 @@
     i32.store offset=4
     local.get $5
     local.get $4
-    local.get $6
+    local.get $7
     local.get $3
-    local.get $4
+    local.get $6
     call $~lib/array/Array<f64>#__get
     f64.sub
     call $~lib/array/Array<f64>#__set
@@ -6788,7 +6797,7 @@
     local.get $3
     i32.store offset=4
     local.get $3
-    local.get $4
+    local.get $6
     local.get $2
     local.get $4
     call $~lib/array/Array<f64>#__get

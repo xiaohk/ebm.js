@@ -280,7 +280,7 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
       }
 
       updateModel(changedBinIndexes, changedScores) {
-        let changedBinIndexesPtr = __pin(__newArray(wasm.Float64Array_ID, changedBinIndexes));
+        let changedBinIndexesPtr = __pin(__newArray(wasm.Int32Array2D_ID, changedBinIndexes));
         let changedScoresPtr = __pin(__newArray(wasm.Float64Array_ID, changedScores));
 
         this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);

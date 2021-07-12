@@ -315,9 +315,10 @@ export class __EBM {
 
     for (let i = 0; i < changedBinIndexes.length; i++) {
       // Keep track the score difference for later faster prediction
-      scoreDiffs[i] = changedScores[i] - this.scores[this.editingFeatureIndex][i];
+      let b = changedBinIndexes[i];
+      scoreDiffs[i] = changedScores[i] - this.scores[this.editingFeatureIndex][b];
 
-      this.scores[this.editingFeatureIndex][i] = changedScores[i];
+      this.scores[this.editingFeatureIndex][b] = changedScores[i];
     }
 
     // Update the prediction
@@ -328,7 +329,8 @@ export class __EBM {
     // We know which bin has been changed and which samples are affected, so we
     // only need to update their predictions
     for (let i = 0; i < changedBinIndexes.length; i++) {
-      let affectedSampleIDs = this.editingFeatureSampleMap[i];
+      let b = changedBinIndexes[i];
+      let affectedSampleIDs = this.editingFeatureSampleMap[b];
 
       for (let j = 0; j < affectedSampleIDs.length; j++) {
         let s = affectedSampleIDs[j];
@@ -457,6 +459,7 @@ export class __EBM {
       let curResult = new Array<f64>();
       let affectedLabels = new Array<f64>(sampleIDs.length);
       let affectedPredLabels = new Array<f64>(sampleIDs.length);
+
       for (let s = 0; s < sampleIDs.length; s++) {
         affectedLabels[s] = this.labels[sampleIDs[s]];
         affectedPredLabels[s] = this.predLabels[sampleIDs[s]];
@@ -469,6 +472,7 @@ export class __EBM {
       // Filter the affected labels and their predictions
       let affectedLabels = new Array<f64>(sampleIDs.length);
       let affectedPredLProbs = new Array<f64>(sampleIDs.length);
+
       for (let s = 0; s < sampleIDs.length; s++) {
         affectedLabels[s] = this.labels[sampleIDs[s]];
         affectedPredLProbs[s] = this.predProbs[sampleIDs[s]];
