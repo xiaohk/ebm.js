@@ -136,14 +136,9 @@ class EBM {
       }
 
       // Pin the inner 1D arrays
-      let curBinEdgePtr = __newArray(wasm.Float64Array_ID, curBinEdge);
-      __pin(curBinEdgePtr);
-
-      let curScorePtr = __newArray(wasm.Float64Array_ID, curScore);
-      __pin(curScorePtr);
-
-      let curHistBinEdgesPtr = __newArray(wasm.Float64Array_ID, curHistBinEdge);
-      __pin(curHistBinEdgesPtr);
+      let curBinEdgePtr = __pin(__newArray(wasm.Float64Array_ID, curBinEdge));
+      let curScorePtr = __pin(__newArray(wasm.Float64Array_ID, curScore));
+      let curHistBinEdgesPtr = __pin(__newArray(wasm.Float64Array_ID, curHistBinEdge));
 
       binEdges.push(curBinEdgePtr);
       scores.push(curScorePtr);
@@ -151,12 +146,9 @@ class EBM {
     }
 
     // Pin the 2D arrays
-    const binEdgesPtr = __newArray(wasm.Float64Array2D_ID, binEdges);
-    __pin(binEdgesPtr);
-    const scoresPtr = __newArray(wasm.Float64Array2D_ID, scores);
-    __pin(scoresPtr);
-    const histBinEdgesPtr = __newArray(wasm.Float64Array2D_ID, histBinEdges);
-    __pin(histBinEdgesPtr);
+    const binEdgesPtr = __pin(__newArray(wasm.Float64Array2D_ID, binEdges));
+    const scoresPtr = __pin(__newArray(wasm.Float64Array2D_ID, scores));
+    const histBinEdgesPtr = __pin(__newArray(wasm.Float64Array2D_ID, histBinEdges));
 
     /**
      * Step 2: For the interaction effect, we want to store the feature
@@ -174,8 +166,7 @@ class EBM {
         let index1 = sampleData.featureNames.indexOf(d.name1);
         let index2 = sampleData.featureNames.indexOf(d.name2);
 
-        let curIndexesPtr = __newArray(wasm.Int32Array_ID, [index1, index2]);
-        __pin(curIndexesPtr);
+        let curIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, [index1, index2]));
         interactionIndexes.push(curIndexesPtr);
 
         // Collect two bin edges
@@ -195,19 +186,16 @@ class EBM {
           binEdge2Ptr = __pin(__newArray(wasm.Float64Array_ID, d.binLabel2.slice(0, -1)));
         }
 
-        let curBinEdgesPtr = __newArray(wasm.Float64Array2D_ID, [binEdge1Ptr, binEdge2Ptr]);
-        __pin(curBinEdgesPtr);
+        let curBinEdgesPtr = __pin(__newArray(wasm.Float64Array2D_ID, [binEdge1Ptr, binEdge2Ptr]));
 
         interactionBinEdges.push(curBinEdgesPtr);
 
         // Add the scores
         let curScore2D = d.additive.map((a) => {
-          let aPtr = __newArray(wasm.Float64Array_ID, a);
-          __pin(aPtr);
+          let aPtr = __pin(__newArray(wasm.Float64Array_ID, a));
           return aPtr;
         });
-        let curScore2DPtr = __newArray(wasm.Float64Array2D_ID, curScore2D);
-        __pin(curScore2DPtr);
+        let curScore2DPtr = __pin(__newArray(wasm.Float64Array2D_ID, curScore2D));
         interactionScores.push(curScore2DPtr);
       }
     });
@@ -221,17 +209,9 @@ class EBM {
      * Step 3: Pass the sample data to WASM. We directly transfer this 2D float
      * array to WASM (assume categorical features are encoded already)
      */
-    let samples = sampleData.samples.map((d) => {
-      let curPtr = __newArray(wasm.Float64Array_ID, d);
-      __pin(curPtr);
-      return curPtr;
-    });
-
-    let samplesPtr = __newArray(wasm.Float64Array2D_ID, samples);
-    __pin(samplesPtr);
-
-    let labelsPtr = __newArray(wasm.Float64Array_ID, sampleData.labels);
-    __pin(labelsPtr);
+    let samples = sampleData.samples.map((d) => __pin(__newArray(wasm.Float64Array_ID, d)));
+    let samplesPtr = __pin(__newArray(wasm.Float64Array2D_ID, samples));
+    let labelsPtr = __pin(__newArray(wasm.Float64Array_ID, sampleData.labels));
 
     /**
      * Step 4: Initialize the EBM in WASM
@@ -318,11 +298,8 @@ class EBM {
   }
 
   updateModel(changedBinIndexes, changedScores) {
-    let changedBinIndexesPtr = __newArray(wasm.Float64Array_ID, changedBinIndexes);
-    let changedScoresPtr = __newArray(wasm.Float64Array_ID, changedScores);
-
-    __pin(changedBinIndexesPtr);
-    __pin(changedScoresPtr);
+    let changedBinIndexesPtr = __pin(__newArray(wasm.Float64Array_ID, changedBinIndexes));
+    let changedScoresPtr = __pin(__newArray(wasm.Float64Array_ID, changedScores));
 
     this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);
 
@@ -331,11 +308,8 @@ class EBM {
   }
 
   setModel(newBinEdges, newScores) {
-    let newBinEdgesPtr = __newArray(wasm.Float64Array_ID, newBinEdges);
-    let newScoresPtr = __newArray(wasm.Float64Array_ID, newScores);
-
-    __pin(newBinEdgesPtr);
-    __pin(newScoresPtr);
+    let newBinEdgesPtr = __pin(__newArray(wasm.Float64Array_ID, newBinEdges));
+    let newScoresPtr = __pin(__newArray(wasm.Float64Array_ID, newScores));
 
     this.ebm.setModel(newBinEdgesPtr, newScoresPtr);
 
@@ -596,11 +570,8 @@ class EBM {
  * @returns {number} score
  */
 const __rootMeanSquaredError = (yTrue, yPred) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yPred));
 
   let result = wasm.rootMeanSquaredError(yTruePtr, yPredPtr);
 
@@ -617,11 +588,8 @@ const __rootMeanSquaredError = (yTrue, yPred) => {
  * @returns {number} score
  */
 const __meanAbsoluteError = (yTrue, yPred) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yPred);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yPred));
 
   let result = wasm.meanAbsoluteError(yTruePtr, yPredPtr);
 
@@ -638,11 +606,8 @@ const __meanAbsoluteError = (yTrue, yPred) => {
  * @returns {number} score
  */
 const __countByThreshold = (yTrue, yScore) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yScore));
 
   let result = wasm.countByThreshold(yTruePtr, yPredPtr);
 
@@ -657,11 +622,8 @@ const __countByThreshold = (yTrue, yScore) => {
 };
 
 const __getROCCurve = (yTrue, yScore) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yScore));
 
   let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
   __pin(countResult);
@@ -680,11 +642,8 @@ const __getROCCurve = (yTrue, yScore) => {
 };
 
 const __getPRCurve = (yTrue, yScore) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yScore);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yScore));
 
   let countResult = wasm.countByThreshold(yTruePtr, yPredPtr);
   __pin(countResult);
@@ -737,11 +696,8 @@ const __getAveragePrecision = (yTrue, yScore) => {
 };
 
 const __getAccuracy = (yTrue, yProb) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yProb));
 
   let accuracy = wasm.getAccuracy(yTruePtr, yPredPtr);
 
@@ -751,11 +707,8 @@ const __getAccuracy = (yTrue, yProb) => {
 };
 
 const __getConfusionMatrix = (yTrue, yProb) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yProb));
 
   let confusionMatrix = __getArray(wasm.getConfusionMatrix(yTruePtr, yPredPtr));
 
@@ -765,11 +718,8 @@ const __getConfusionMatrix = (yTrue, yProb) => {
 };
 
 const __getBalancedAccuracy = (yTrue, yProb) => {
-  let yTruePtr = __newArray(wasm.Float64Array_ID, yTrue);
-  let yPredPtr = __newArray(wasm.Float64Array_ID, yProb);
-
-  __pin(yTruePtr);
-  __pin(yPredPtr);
+  let yTruePtr = __pin(__newArray(wasm.Float64Array_ID, yTrue));
+  let yPredPtr = __pin(__newArray(wasm.Float64Array_ID, yProb));
 
   let confusionMatrixPtr = __pin((wasm.getConfusionMatrix(yTruePtr, yPredPtr)));
 
