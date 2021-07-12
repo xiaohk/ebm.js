@@ -82,6 +82,9 @@ export class __EBM {
   editingFeatureSampleMap: Array<Array<i32>>;
   histBinCounts: Array<Array<i32>>;
 
+  // Track the sample IDs of the selected slice
+  sliceSampleIDs: Array<i32>;
+
   /**
    * 
    * @param featureNames Feature names
@@ -240,6 +243,12 @@ export class __EBM {
         this.predProbs[i] = sigmoid(this.predLabels[i]);
       }
     }
+
+    /**
+     * Step 3: properties that will be initialized later
+     */
+
+    this.sliceSampleIDs = [];
   }
 
   /**
@@ -435,11 +444,106 @@ export class __EBM {
       let balancedAccuracy = getBalancedAccuracy(confusionMatrix);
 
       output.push([[accuracy, rocAuc, balancedAccuracy]]);
-
-      return output;
     }
 
     return output;
+  }
+
+  getMetricsOnSelectedSamples(sampleIDs: Array<i32>): Array<Array<Array<f64>>> {
+    let output = new Array<Array<Array<f64>>>();
+
+    if (!this.isClassification) {
+      // Filter the affected labels and their predictions
+      let curResult = new Array<f64>();
+      let affectedLabels = new Array<f64>(sampleIDs.length);
+      let affectedPredLabels = new Array<f64>(sampleIDs.length);
+      for (let s = 0; s < sampleIDs.length; s++) {
+        affectedLabels[s] = this.labels[sampleIDs[s]];
+        affectedPredLabels[s] = this.predLabels[sampleIDs[s]];
+      }
+
+      curResult.push(rootMeanSquaredError(affectedLabels, affectedPredLabels));
+      curResult.push(meanAbsoluteError(affectedLabels, affectedPredLabels));
+      output.push([curResult]);
+    } else {
+      // Filter the affected labels and their predictions
+      let affectedLabels = new Array<f64>(sampleIDs.length);
+      let affectedPredLProbs = new Array<f64>(sampleIDs.length);
+      for (let s = 0; s < sampleIDs.length; s++) {
+        affectedLabels[s] = this.labels[sampleIDs[s]];
+        affectedPredLProbs[s] = this.predProbs[sampleIDs[s]];
+      }
+
+      // Compute ROC curves
+      let countResult = countByThreshold(affectedLabels, affectedPredLProbs);
+      let rocPoints = getROCCurve(countResult);
+
+      output.push(rocPoints);
+
+      // Compute confusion matrix
+      let confusionMatrix = getConfusionMatrix(affectedLabels, affectedPredLProbs);
+
+      output.push([confusionMatrix]);
+
+      // Compute summary statistics
+      let rocAuc = getROCAuc(rocPoints);
+      let accuracy = getAccuracy(affectedLabels, affectedPredLProbs);
+      let balancedAccuracy = getBalancedAccuracy(confusionMatrix);
+
+      output.push([[accuracy, rocAuc, balancedAccuracy]]);
+    }
+
+    return output;
+  }
+
+  /**
+   * Compute the performance metrics on the affected samples of the selected bins.
+   * @param binIndexes Bin indexes of a interested region
+   */
+  getMetricsOnSelectedBins(binIndexes: Array<i32>): Array<Array<Array<f64>>> {
+
+    // Get the affected sample IDs
+    let affectedIDs = new Array<i32>();
+    for (let i = 0; i < binIndexes.length; i++) {
+      let ids = this.editingFeatureSampleMap[binIndexes[i]];
+
+      for (let ids_i = 0; ids_i < ids.length; ids_i++) {
+        affectedIDs.push(ids[ids_i]);
+      }
+    }
+
+    return this.getMetricsOnSelectedSamples(affectedIDs);
+  }
+
+  /**
+   * Compute the performance metrics on the affected slice of samples.
+   * This function assumes this.sliceSampleIDs has been set correctly.
+   */
+  getMetricsOnSelectedSlice(): Array<Array<Array<f64>>> {
+    return this.getMetricsOnSelectedSamples(this.sliceSampleIDs);
+  }
+
+  /**
+   * Set this.sliceSampleIDs with the selected categorical level.
+   * this.sliceSampleIDs tracks all test samples have the given categorical level.
+   * @param featureID Index of the interested categorical variable
+   * @param featureLevel Integer encoding for the interested categorical level (value)
+   */
+  setSliceData(featureID: i32, featureLevel: i32): void {
+    if (this.featureTypes[featureID] == 'continuous') {
+      trace('[WASM] Cannot slice continuous variable ' + this.featureNames[featureID]);
+      return;
+    }
+
+    this.sliceSampleIDs = [];
+
+    // Iterate through all the test samples to collect the ones having the level
+    for (let i = 0; i < this.samples.length; i++) {
+      let curFeature = this.samples[i][featureID];
+      if (curFeature == featureLevel) {
+        this.sliceSampleIDs.push(i);
+      }
+    }
   }
 
   printName(): string {

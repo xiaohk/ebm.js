@@ -435,6 +435,158 @@ class EBM {
     // let metrics = __getArray(this.ebm.getMetrics());
     return metrics;
   }
+
+  getMetricsOnSelectedBins(binIndexes) {
+    let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
+
+    /**
+     * (1) regression: [[[RMSE, MAE]]]
+     * (2) binary classification: [roc 2D points, [confusion matrix 1D],
+     *  [[accuracy, roc auc, balanced accuracy]]]
+     */
+
+    // Unpack the return value from getMetrics()
+    let metrics = {};
+    if (!this.isClassification) {
+      let result3D = __getArray(this.ebm.getMetricsOnSelectedBins(binIndexesPtr));
+      let result3DPtr = __pin(result3D);
+
+      let result2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.rmse = result1D[0];
+      metrics.mae = result1D[1];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+      __unpin(result3DPtr);
+    } else {
+      // Unpack ROC curves
+      let result3D = __getArray(this.ebm.getMetricsOnSelectedBins(binIndexesPtr));
+      let result3DPtr = __pin(result3D);
+
+      let result1DPtrs = [];
+      let roc2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(roc2D);
+
+      let rocPoints = roc2D.map(d => {
+        let point = __getArray(d);
+        result1DPtrs.push(__pin(point));
+        return point;
+      });
+
+      metrics.rocCurve = rocPoints;
+      result1DPtrs.map(d => __unpin(d));
+      __unpin(result2DPtr);
+
+      // Unpack confusion matrix
+      let result2D = __getArray(result3D[1]);
+      result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.confusionMatrix = result1D;
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+
+      // Unpack summary statistics
+      result2D = __getArray(result3D[2]);
+      result2DPtr = __pin(result2D);
+
+      result1D = __getArray(result2D[0]);
+      result1DPtr = __pin(result1D);
+
+      metrics.accuracy = result1D[0];
+      metrics.rocAuc = result1D[1];
+      metrics.balancedAccuracy = result1D[2];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+      __unpin(result3DPtr);
+    }
+    __unpin(binIndexesPtr);
+
+    return metrics;
+  }
+
+  getMetricsOnSelectedSlice() {
+    // Unpack the return value from getMetrics()
+    let metrics = {};
+    if (!this.isClassification) {
+      let result3D = __getArray(this.ebm.getMetricsOnSelectedSlice());
+      let result3DPtr = __pin(result3D);
+
+      let result2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.rmse = result1D[0];
+      metrics.mae = result1D[1];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+      __unpin(result3DPtr);
+    } else {
+      // Unpack ROC curves
+      let result3D = __getArray(this.ebm.getMetricsOnSelectedSlice());
+      let result3DPtr = __pin(result3D);
+
+      let result1DPtrs = [];
+      let roc2D = __getArray(result3D[0]);
+      let result2DPtr = __pin(roc2D);
+
+      let rocPoints = roc2D.map(d => {
+        let point = __getArray(d);
+        result1DPtrs.push(__pin(point));
+        return point;
+      });
+
+      metrics.rocCurve = rocPoints;
+      result1DPtrs.map(d => __unpin(d));
+      __unpin(result2DPtr);
+
+      // Unpack confusion matrix
+      let result2D = __getArray(result3D[1]);
+      result2DPtr = __pin(result2D);
+
+      let result1D = __getArray(result2D[0]);
+      let result1DPtr = __pin(result1D);
+
+      metrics.confusionMatrix = result1D;
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+
+      // Unpack summary statistics
+      result2D = __getArray(result3D[2]);
+      result2DPtr = __pin(result2D);
+
+      result1D = __getArray(result2D[0]);
+      result1DPtr = __pin(result1D);
+
+      metrics.accuracy = result1D[0];
+      metrics.rocAuc = result1D[1];
+      metrics.balancedAccuracy = result1D[2];
+
+      __unpin(result1DPtr);
+      __unpin(result2DPtr);
+      __unpin(result3DPtr);
+    }
+
+    return metrics;
+  }
+
+  setSliceData(featureID, featureLevel) {
+    this.ebm.setSliceData(featureID, featureLevel);
+  }
+
 }
 
 /**
