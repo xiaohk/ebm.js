@@ -43,9 +43,15 @@ export function searchSortedLowerIndex(sorted: Array<f64>, value: f64): i32 {
   return right - 1;
 }
 
+function round(num: f64, decimal: i32): f64 {
+  return Math.round((num + 2e-16) * (10 ** decimal)) / (10 ** decimal);
+};
+
 function sigmoid(logit: f64): f64 {
   let odd = Math.exp(logit);
-  return odd / (1 + odd);
+
+  // Round the prob for more stable ROC AUC computation
+  return round(odd / (1 + odd), 3);
 }
 
 export class __EBM {
@@ -533,10 +539,10 @@ export class __EBM {
    * @param featureID Index of the interested categorical variable
    * @param featureLevel Integer encoding for the interested categorical level (value)
    */
-  setSliceData(featureID: i32, featureLevel: i32): void {
+  setSliceData(featureID: i32, featureLevel: i32): i32 {
     if (this.featureTypes[featureID] == 'continuous') {
       trace('[WASM] Cannot slice continuous variable ' + this.featureNames[featureID]);
-      return;
+      return -1;
     }
 
     this.sliceSampleIDs = [];
@@ -548,6 +554,8 @@ export class __EBM {
         this.sliceSampleIDs.push(i);
       }
     }
+
+    return this.sliceSampleIDs.length;
   }
 
   printName(): string {

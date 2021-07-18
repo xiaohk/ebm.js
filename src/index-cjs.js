@@ -298,7 +298,7 @@ class EBM {
   }
 
   updateModel(changedBinIndexes, changedScores) {
-    let changedBinIndexesPtr = __pin(__newArray(wasm.Int32Array2D_ID, changedBinIndexes));
+    let changedBinIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, changedBinIndexes));
     let changedScoresPtr = __pin(__newArray(wasm.Float64Array_ID, changedScores));
 
     this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);
@@ -558,7 +558,7 @@ class EBM {
   }
 
   setSliceData(featureID, featureLevel) {
-    this.ebm.setSliceData(featureID, featureLevel);
+    return this.ebm.setSliceData(featureID, featureLevel);
   }
 
 }
