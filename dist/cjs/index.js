@@ -253,6 +253,9 @@ class EBM {
     __unpin(featureNamesPtr);
   }
 
+  /**
+   * Free the ebm wasm memory.
+   */
   destroy() {
     __unpin(this.ebm);
     this.ebm = null;
@@ -264,15 +267,28 @@ class EBM {
     console.log('Editing: ', name);
   }
 
+  /**
+   * Get the current predicted probabilities
+   * @returns Predicted probabilities
+   */
   getProb() {
     let predProbs = __getArray(this.ebm.getPrediction());
     return predProbs;
   }
 
+  /**
+   * Get the current predictions (logits for classification or continuous values
+   * for regression)
+   * @returns predictions
+   */
   getScore() {
     return __getArray(this.ebm.predLabels);
   }
 
+  /**
+   * Get the binary classification results
+   * @returns Binary predictions
+   */
   getPrediction() {
     if (this.isClassification) {
       let predProbs = __getArray(this.ebm.getPrediction());
@@ -281,6 +297,11 @@ class EBM {
     return __getArray(this.ebm.getPrediction());
   }
 
+  /**
+   * Get the number of test samples affected by the given binIndexes
+   * @param {[int]} binIndexes Indexes of bins
+   * @returns {int} number of samples
+   */
   getSelectedSampleNum(binIndexes) {
     let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
     let count = this.ebm.getSelectedSampleNum(binIndexesPtr);
@@ -288,6 +309,11 @@ class EBM {
     return count;
   }
 
+  /**
+   * Get the distribution of the samples affected by the given inIndexes
+   * @param {[int]} binIndexes Indexes of bins
+   * @returns [[int]] distributions of different bins
+   */
   getSelectedSampleDist(binIndexes) {
     let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
     let histBinCounts = __getArray(this.ebm.getSelectedSampleDist(binIndexesPtr));
@@ -296,17 +322,34 @@ class EBM {
     return histBinCounts;
   }
 
+  /**
+   * Get the histogram from the training data (from EBM python code)
+   * @returns histogram of all bins
+   */
   getHistBinCounts() {
     let histBinCounts = __getArray(this.ebm.histBinCounts);
     histBinCounts = histBinCounts.map(p => __getArray(p));
     return histBinCounts;
   }
 
+  /**
+   * Change the currently editing feature. If this feature has not been edited
+   * before, EBM wasm internally creates a bin-sample mapping for it.
+   * Need to call this function before update() or set() ebm on any feature.
+   * @param {string} featureName Name of the editing feature
+   */
   setEditingFeature(featureName) {
     let featureIndex = this.sampleDataNameMap.get(featureName);
     this.ebm.setEditingFeature(featureIndex);
   }
 
+  /**
+   * Change the scores of some bins of a feature.
+   * This function assumes setEditingFeature(featureName) has been called once
+   * @param {[int]} changedBinIndexes Indexes of bins
+   * @param {[float]} changedScores Target scores for these bins
+   * @param {string} featureName Name of the feature to update
+   */
   updateModel(changedBinIndexes, changedScores, featureName = undefined) {
     // Get the feature index based on the feature name if it is specified
     let featureIndex = this.editingFeatureIndex;
@@ -323,6 +366,13 @@ class EBM {
     __unpin(changedScoresPtr);
   }
 
+  /**
+   * Overwrite the whole bin definition for some continuous feature
+   * This function assumes setEditingFeature(featureName) has been called once
+   * @param {[int]} changedBinIndexes Indexes of all new bins
+   * @param {[float]} changedScores Target scores for these bins
+   * @param {string} featureName Name of the feature to overwrite
+   */
   setModel(newBinEdges, newScores, featureName = undefined) {
     // Get the feature index based on the feature name if it is specified
     let featureIndex = this.editingFeatureIndex;
@@ -339,6 +389,10 @@ class EBM {
     __unpin(newScoresPtr);
   }
 
+  /**
+   * Get the metrics
+   * @returns {object}
+   */
   getMetrics() {
 
     /**
@@ -432,6 +486,11 @@ class EBM {
     return metrics;
   }
 
+  /**
+   * Get the metrics on the selected bins
+   * @param {[int]} binIndexes Indexes of selected bins
+   * @returns {object}
+   */
   getMetricsOnSelectedBins(binIndexes) {
     let binIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, binIndexes));
 
@@ -510,6 +569,11 @@ class EBM {
     return metrics;
   }
 
+  /**
+   * Get the metrics on the selected slice
+   * This function assumes setSliceData() has been called
+   * @returns {object}
+   */
   getMetricsOnSelectedSlice() {
     // Unpack the return value from getMetrics()
     let metrics = {};
@@ -579,6 +643,12 @@ class EBM {
     return metrics;
   }
 
+  /**
+   * Set the current sliced data (a level of a categorical feature)
+   * @param {int} featureID The index of the categorical feature
+   * @param {int} featureLevel The integer encoding of the variable level
+   * @returns {int} Number of test samples in this slice
+   */
   setSliceData(featureID, featureLevel) {
     return this.ebm.setSliceData(featureID, featureLevel);
   }

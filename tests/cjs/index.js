@@ -11,7 +11,7 @@ require('./searchSortedLowerIndex.test');
 require('./metrics.test');
 
 // --- Testing EBM class ---
-// require('./ebm.test');
+require('./ebm.test');
 
 // --- More test on the EBM class with a focus on model updating ---
 require('./ebm-update.test');

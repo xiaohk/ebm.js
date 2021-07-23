@@ -642,10 +642,10 @@ class EBM {
   }
 
   /**
-   * 
-   * @param {*} featureID 
-   * @param {*} featureLevel 
-   * @returns 
+   * Set the current sliced data (a level of a categorical feature)
+   * @param {int} featureID The index of the categorical feature
+   * @param {int} featureLevel The integer encoding of the variable level
+   * @returns {int} Number of test samples in this slice
    */
   setSliceData(featureID, featureLevel) {
     return this.ebm.setSliceData(featureID, featureLevel);
