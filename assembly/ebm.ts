@@ -86,6 +86,7 @@ export class __EBM {
   predLabels: Array<f64>;
   predProbs: Array<f64>;
   editingFeatureSampleMap: Array<Array<i32>>;
+  editingFeatureSampleMaps: Map<i32, Array<Array<i32>>>;
   histBinCounts: Array<Array<i32>>;
 
   // Track the sample IDs of the selected slice
@@ -153,6 +154,10 @@ export class __EBM {
       this.editingFeatureSampleMap[b] = new Array<i32>();
     }
 
+    // We use editingFeatureSampleMaps to track all the feature maps
+    this.editingFeatureSampleMaps = new Map<i32, Array<Array<i32>>>();
+    this.editingFeatureSampleMaps.set(this.editingFeatureIndex, this.editingFeatureSampleMap);
+
     // Initialize the hist bin counts
     for (let b = 0; b < this.binEdges.length; b++) {
       this.histBinCounts[b] = new Array<i32>(this.histBinEdges[b].length).fill(0);
@@ -198,7 +203,7 @@ export class __EBM {
 
         // If we encounter the editing feature, we also want to collect the sample
         // IDs for each bin
-        if (j == this.editingFeatureIndex) {
+        if (j == this.editingFeatureIndex && binIndex >= 0) {
           this.editingFeatureSampleMap[binIndex].push(i);
         }
 
@@ -315,28 +320,28 @@ export class __EBM {
     return binCounts;
   }
 
-  updateModel(changedBinIndexes: Array<i32>, changedScores: Array<f64>): void {
+  updateModel(changedBinIndexes: Array<i32>, changedScores: Array<f64>, featureIndex: i32): void {
     // Update the bin scores
     let scoreDiffs = new Array<f64>(changedScores.length);
 
     for (let i = 0; i < changedBinIndexes.length; i++) {
       // Keep track the score difference for later faster prediction
       let b = changedBinIndexes[i];
-      scoreDiffs[i] = changedScores[i] - this.scores[this.editingFeatureIndex][b];
+      scoreDiffs[i] = changedScores[i] - this.scores[featureIndex][b];
 
-      this.scores[this.editingFeatureIndex][b] = changedScores[i];
+      this.scores[featureIndex][b] = changedScores[i];
     }
 
     // Update the prediction
-    this.updatePredictionPartial(changedBinIndexes, scoreDiffs);
+    this.updatePredictionPartial(changedBinIndexes, scoreDiffs, featureIndex);
   }
 
-  updatePredictionPartial(changedBinIndexes: Array<i32>, scoreDiffs: Array<f64>): void {
+  updatePredictionPartial(changedBinIndexes: Array<i32>, scoreDiffs: Array<f64>, featureIndex: i32): void {
     // We know which bin has been changed and which samples are affected, so we
     // only need to update their predictions
     for (let i = 0; i < changedBinIndexes.length; i++) {
       let b = changedBinIndexes[i];
-      let affectedSampleIDs = this.editingFeatureSampleMap[b];
+      let affectedSampleIDs = this.editingFeatureSampleMaps.get(featureIndex)[b];
 
       for (let j = 0; j < affectedSampleIDs.length; j++) {
         let s = affectedSampleIDs[j];
@@ -352,15 +357,18 @@ export class __EBM {
 
   /**
    * Overwrite the bin definition and scores of the current editing feature.
+   * This function assumes the feature has been set before (existing
+   * editingFeatureSampleMaps entry, setEditingFeature() has been called)
    * @param newBinEdges New bin edges.
    * @param newScores New bin scores.
+   * @param featureIndex Index of the feature to edit.
    */
-  setModel(newBinEdges: Array<f64>, newScores: Array<f64>): void {
+  setModel(newBinEdges: Array<f64>, newScores: Array<f64>, featureIndex: i32): void {
 
     // Step 1: Remove the effect of this feature from logits (re-compute prob later)
-    for (let b = 0; b < this.binEdges[this.editingFeatureIndex].length; b++) {
-      let affectedSampleIDs = this.editingFeatureSampleMap[b];
-      let curBinScore = this.scores[this.editingFeatureIndex][b];
+    for (let b = 0; b < this.binEdges[featureIndex].length; b++) {
+      let affectedSampleIDs = this.editingFeatureSampleMaps.get(featureIndex)[b];
+      let curBinScore = this.scores[featureIndex][b];
 
       for (let i = 0; i < affectedSampleIDs.length; i++) {
         let s = affectedSampleIDs[i];
@@ -369,32 +377,32 @@ export class __EBM {
     }
 
     // Step 2: overwrite the bin edges and scores
-    this.binEdges[this.editingFeatureIndex] = newBinEdges;
-    this.scores[this.editingFeatureIndex] = newScores;
+    this.binEdges[featureIndex] = newBinEdges;
+    this.scores[featureIndex] = newScores;
 
     // Step 3: Re-indexing the sample IDs & Add the new score to logits
-    this.editingFeatureSampleMap = new Array<Array<i32>>(newBinEdges.length);
+    let curEditingFeatureSampleMap = new Array<Array<i32>>(newBinEdges.length);
 
     // Initialize the editing feature map
     for (let b = 0; b < newBinEdges.length; b++) {
-      this.editingFeatureSampleMap[b] = new Array<i32>();
+      curEditingFeatureSampleMap[b] = new Array<i32>();
     }
 
     for (let s = 0; s < this.samples.length; s++) {
-      let curFeature = this.samples[s][this.editingFeatureIndex];
+      let curFeature = this.samples[s][featureIndex];
 
       // Use the feature value to find the corresponding bin
       let binIndex: i32;
       let binScore: f64;
 
-      if (this.featureTypes[this.editingFeatureIndex] == 'continuous') {
+      if (this.featureTypes[featureIndex] == 'continuous') {
         binIndex = searchSortedLowerIndex(newBinEdges, curFeature);
         binScore = newScores[binIndex];
       } else {
         binIndex = newBinEdges.indexOf(curFeature);
         if (binIndex < 0) {
           // Unseen level during training => use 0 as score instead
-          console.log(`>> Unseen feature: ${this.featureNames[this.editingFeatureIndex]}, ${s}, ${curFeature}`);
+          console.log(`>> Unseen feature: ${this.featureNames[featureIndex]}, ${s}, ${curFeature}`);
           binScore = 0
         } else {
           binScore = newScores[binIndex];
@@ -411,8 +419,13 @@ export class __EBM {
 
       // Track the sample ID in the index
       // console.log([s, binIndex, curFeature]);
-      this.editingFeatureSampleMap[binIndex].push(s);
+      if (binIndex >= 0) {
+        curEditingFeatureSampleMap[binIndex].push(s);
+      }
     }
+
+    // Update the featureSampleMap in our record
+    this.editingFeatureSampleMaps.set(featureIndex, curEditingFeatureSampleMap);
   }
 
   getPrediction(): Array<f64> {
@@ -558,8 +571,73 @@ export class __EBM {
     return this.sliceSampleIDs.length;
   }
 
+  /**
+   * Change the current editing feature. If this feature has not been edited before,
+   * this function creates a new editingFeatureSampleMap for it
+   * @param featureID Index of the interested categorical variable
+   */
+  setEditingFeature(featureID: i32): void {
+
+    this.editingFeatureIndex = featureID;
+
+    // Creates a new feature sample map
+    if (!this.editingFeatureSampleMaps.has(featureID)) {
+      this.editingFeatureSampleMap = new Array<Array<i32>>(this.binEdges[this.editingFeatureIndex].length);
+
+      // Initialize the editing feature map
+      for (let b = 0; b < this.binEdges[this.editingFeatureIndex].length; b++) {
+        this.editingFeatureSampleMap[b] = new Array<i32>();
+      }
+
+      // Populate the map
+      for (let i = 0; i < this.samples.length; i++) {
+
+        let curFeatureType = this.featureTypes[featureID];
+        let curFeature = this.samples[i][featureID];
+
+        // Use the feature value to find the corresponding bin
+        let binIndex: i32;
+
+        if (curFeatureType == 'continuous') {
+          binIndex = searchSortedLowerIndex(this.binEdges[featureID], curFeature);
+        } else {
+          binIndex = this.binEdges[featureID].indexOf(curFeature);
+        }
+
+        if (binIndex >= 0) {
+          this.editingFeatureSampleMap[binIndex].push(i);
+        }
+      }
+
+      // Keep track the map
+      this.editingFeatureSampleMaps.set(featureID, this.editingFeatureSampleMap);
+    }
+
+    this.editingFeatureSampleMap = this.editingFeatureSampleMaps.get(featureID);
+  }
+
+  // Use this function to test assembly script stuff
   printName(): string {
     trace('editing', 1, this.editingFeatureIndex);
+
+    let test3dArray = new Array<Array<Array<i32>>>();
+    let test2dArray = new Array<Array<i32>>();
+    test3dArray.push(test2dArray);
+
+    let test1dArray = [1, 2, 3];
+    test2dArray.push(test1dArray);
+
+    console.log(test2dArray[0]);
+
+    let temp = test2dArray[0];
+    temp[0] = 10;
+    console.log(test2dArray[0]);
+
+    temp = [0, 1];
+    temp[0] = 20;
+    console.log(test2dArray[0]);
+
+
     return this.featureTypes[this.editingFeatureIndex];
   };
 

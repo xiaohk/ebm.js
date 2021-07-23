@@ -80,6 +80,8 @@ const __unpin3DArray = (array3d) => {
 class EBM {
   // Store an instance of WASM EBM
   ebm;
+  sampleDataNameMap;
+  editingFeatureIndex;
 
   constructor(featureData, sampleData, editingFeature, isClassification) {
 
@@ -100,13 +102,14 @@ class EBM {
     let featureDataNameMap = new Map();
     featureData.features.forEach((d, i) => featureDataNameMap.set(d.name, i));
 
-    let sampleDataNameMap = new Map();
-    sampleData.featureNames.forEach((d, i) => sampleDataNameMap.set(d, i));
+    this.sampleDataNameMap = new Map();
+    sampleData.featureNames.forEach((d, i) => this.sampleDataNameMap.set(d, i));
 
     let featureNamesPtr = __createStringArray(sampleData.featureNames);
     let featureTypesPtr = __createStringArray(sampleData.featureTypes);
 
-    let editingFeatureIndex = sampleData.featureNames.findIndex((d) => d === editingFeature);
+    let editingFeatureIndex = this.sampleDataNameMap.get(editingFeature);
+    this.editingFeatureIndex = editingFeatureIndex;
 
     // Create two 2D arrays for binEdge ([feature, bin]) and score ([feature, bin]) respectively
     // We mix continuous and categorical together (assume the categorical features
@@ -299,21 +302,38 @@ class EBM {
     return histBinCounts;
   }
 
-  updateModel(changedBinIndexes, changedScores) {
+  setEditingFeature(featureName) {
+    let featureIndex = this.sampleDataNameMap.get(featureName);
+    this.ebm.setEditingFeature(featureIndex);
+  }
+
+  updateModel(changedBinIndexes, changedScores, featureName = undefined) {
+    // Get the feature index based on the feature name if it is specified
+    let featureIndex = this.editingFeatureIndex;
+    if (featureName !== undefined) {
+      featureIndex = this.sampleDataNameMap.get(featureName);
+    }
+
     let changedBinIndexesPtr = __pin(__newArray(wasm.Int32Array_ID, changedBinIndexes));
     let changedScoresPtr = __pin(__newArray(wasm.Float64Array_ID, changedScores));
 
-    this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr);
+    this.ebm.updateModel(changedBinIndexesPtr, changedScoresPtr, featureIndex);
 
     __unpin(changedBinIndexesPtr);
     __unpin(changedScoresPtr);
   }
 
-  setModel(newBinEdges, newScores) {
+  setModel(newBinEdges, newScores, featureName = undefined) {
+    // Get the feature index based on the feature name if it is specified
+    let featureIndex = this.editingFeatureIndex;
+    if (featureName !== undefined) {
+      featureIndex = this.sampleDataNameMap.get(featureName);
+    }
+
     let newBinEdgesPtr = __pin(__newArray(wasm.Float64Array_ID, newBinEdges));
     let newScoresPtr = __pin(__newArray(wasm.Float64Array_ID, newScores));
 
-    this.ebm.setModel(newBinEdgesPtr, newScoresPtr);
+    this.ebm.setModel(newBinEdgesPtr, newScoresPtr, featureIndex);
 
     __unpin(newBinEdgesPtr);
     __unpin(newScoresPtr);
