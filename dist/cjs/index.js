@@ -82,6 +82,7 @@ class EBM {
   ebm;
   sampleDataNameMap;
   editingFeatureIndex;
+  editingFeatureName;
 
   constructor(featureData, sampleData, editingFeature, isClassification) {
 
@@ -110,6 +111,7 @@ class EBM {
 
     let editingFeatureIndex = this.sampleDataNameMap.get(editingFeature);
     this.editingFeatureIndex = editingFeatureIndex;
+    this.editingFeatureName = editingFeature;
 
     // Create two 2D arrays for binEdge ([feature, bin]) and score ([feature, bin]) respectively
     // We mix continuous and categorical together (assume the categorical features
@@ -341,6 +343,8 @@ class EBM {
   setEditingFeature(featureName) {
     let featureIndex = this.sampleDataNameMap.get(featureName);
     this.ebm.setEditingFeature(featureIndex);
+    this.editingFeatureName = featureName;
+    this.editingFeatureIndex = this.sampleDataNameMap.get(featureName);
   }
 
   /**

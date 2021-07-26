@@ -193,7 +193,7 @@ export class __EBM {
           histBinIndex = this.histBinEdges[j].indexOf(curFeature);
           if (histBinIndex < 0) {
             // Unseen level during training => use 0 as score instead
-            console.log(`[WASM] Unseen categorical level in histogram: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
+            // console.log(`[WASM] Unseen categorical level in histogram: ${curFeatureName}, ${i}, ${j}, ${curFeature}`);
             histBinIndex = 0
           }
         }
@@ -239,7 +239,7 @@ export class __EBM {
         // Query the bin scores
         let binScore: f64;
 
-        if (binIndex2 < 0 || binIndex2 < 0) {
+        if (binIndex1 < 0 || binIndex2 < 0) {
           binScore = 0;
         } else {
           binScore = this.interactionScores[j][binIndex1][binIndex2];
