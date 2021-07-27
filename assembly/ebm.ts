@@ -426,6 +426,7 @@ export class __EBM {
 
     // Update the featureSampleMap in our record
     this.editingFeatureSampleMaps.set(featureIndex, curEditingFeatureSampleMap);
+    this.editingFeatureSampleMap = this.editingFeatureSampleMaps.get(featureIndex);
   }
 
   getPrediction(): Array<f64> {

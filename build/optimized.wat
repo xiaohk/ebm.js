@@ -8354,12 +8354,22 @@
   global.get $~lib/memory/__stack_pointer
   local.get $0
   i32.load offset=72
-  local.tee $0
+  local.tee $1
   i32.store
-  local.get $0
+  local.get $1
   local.get $3
   local.get $7
   call $~lib/map/Map<i32,~lib/array/Array<~lib/array/Array<i32>>>#set
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.load offset=72
+  local.tee $1
+  i32.store
+  local.get $0
+  local.get $1
+  local.get $3
+  call $~lib/map/Map<i32,~lib/array/Array<~lib/array/Array<i32>>>#get
+  call $assembly/ebm/__EBM#set:editingFeatureSampleMap
   global.get $~lib/memory/__stack_pointer
   i32.const 24
   i32.add
