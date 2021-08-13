@@ -4,8 +4,8 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_=>_none (func (param i32)))
- (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_=>_f64 (func (param i32 i32) (result f64)))
+ (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_=>_f64 (func (param i32) (result f64)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
@@ -225,6 +225,7 @@
  (export "__EBM#printName" (func $export:assembly/ebm/__EBM#printName))
  (export "rootMeanSquaredError" (func $export:assembly/metrics/rootMeanSquaredError))
  (export "meanAbsoluteError" (func $export:assembly/metrics/meanAbsoluteError))
+ (export "meanAbsolutePercentageError" (func $export:assembly/metrics/meanAbsolutePercentageError))
  (export "countByThreshold" (func $export:assembly/metrics/countByThreshold))
  (export "getROCCurve" (func $export:assembly/metrics/getROCCurve))
  (export "getPRCurve" (func $export:assembly/metrics/getPRCurve))
@@ -5695,6 +5696,46 @@
   f64.convert_i32_s
   f64.div
  )
+ (func $assembly/metrics/meanAbsolutePercentageError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 i32)
+  (local $3 f64)
+  loop $for-loop|0
+   local.get $2
+   local.get $0
+   i32.load offset=12
+   i32.lt_s
+   if
+    local.get $3
+    local.get $0
+    local.get $2
+    call $~lib/array/Array<f64>#__get
+    local.get $1
+    local.get $2
+    call $~lib/array/Array<f64>#__get
+    f64.sub
+    f64.abs
+    f64.const 1e-06
+    local.get $0
+    local.get $2
+    call $~lib/array/Array<f64>#__get
+    f64.abs
+    f64.max
+    f64.div
+    f64.add
+    local.set $3
+    local.get $2
+    i32.const 1
+    i32.add
+    local.set $2
+    br $for-loop|0
+   end
+  end
+  local.get $3
+  local.get $0
+  i32.load offset=12
+  f64.convert_i32_s
+  f64.div
+ )
  (func $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -9209,11 +9250,8 @@
    global.get $~lib/memory/__stack_pointer
    local.get $1
    call $assembly/metrics/getROCCurve
-   local.tee $2
+   local.tee $3
    i32.store offset=20
-   local.get $4
-   local.get $2
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
    global.get $~lib/memory/__stack_pointer
    local.get $0
    i32.load offset=48
@@ -9222,14 +9260,14 @@
    global.get $~lib/memory/__stack_pointer
    local.get $0
    i32.load offset=64
-   local.tee $3
+   local.tee $2
    i32.store offset=12
    global.get $~lib/memory/__stack_pointer
    local.get $1
-   local.get $3
+   local.get $2
    f64.const 0.5
    call $assembly/metrics/getConfusionMatrix
-   local.tee $3
+   local.tee $2
    i32.store offset=16
    global.get $~lib/memory/__stack_pointer
    i32.const 1
@@ -9245,7 +9283,7 @@
    i32.store offset=28
    local.get $1
    i32.const 0
-   local.get $3
+   local.get $2
    call $~lib/array/Array<~lib/array/Array<i32>>#__uset
    global.get $~lib/memory/__stack_pointer
    local.get $1
@@ -9253,7 +9291,7 @@
    local.get $4
    local.get $1
    call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   local.get $2
+   local.get $3
    call $assembly/metrics/getROCAuc
    local.set $5
    global.get $~lib/memory/__stack_pointer
@@ -9270,7 +9308,7 @@
    local.get $0
    call $assembly/metrics/getAccuracy
    local.set $6
-   local.get $3
+   local.get $2
    call $assembly/metrics/getBalancedAccuracy
    local.set $7
    global.get $~lib/memory/__stack_pointer
@@ -9348,12 +9386,27 @@
    global.get $~lib/memory/__stack_pointer
    local.get $0
    i32.load offset=60
+   local.tee $3
+   i32.store offset=12
+   local.get $1
+   local.get $2
+   local.get $3
+   call $assembly/metrics/meanAbsoluteError
+   call $~lib/array/Array<f64>#push
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=48
+   local.tee $2
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=60
    local.tee $0
    i32.store offset=12
    local.get $1
    local.get $2
    local.get $0
-   call $assembly/metrics/meanAbsoluteError
+   call $assembly/metrics/meanAbsolutePercentageError
    call $~lib/array/Array<f64>#push
    global.get $~lib/memory/__stack_pointer
    i32.const 1
@@ -12766,6 +12819,27 @@
   local.get $0
   local.get $1
   call $assembly/metrics/meanAbsoluteError
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $export:assembly/metrics/meanAbsolutePercentageError (param $0 i32) (param $1 i32) (result f64)
+  (local $2 f64)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $1
+  i32.store offset=4
+  local.get $0
+  local.get $1
+  call $assembly/metrics/meanAbsolutePercentageError
   global.get $~lib/memory/__stack_pointer
   i32.const 8
   i32.add

@@ -23,7 +23,7 @@ export function rootMeanSquaredError(yTrue: Array<f64>, yPred: Array<f64>): f64 
 }
 
 /**
- * Compute the root mean squared error (RMSE)
+ * Compute the mean absolute error (MAE)
  * @param yTrue True values
  * @param yPred Predicted values
  * @returns score
@@ -34,6 +34,20 @@ export function meanAbsoluteError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
     AESum += Math.abs(yTrue[i] - yPred[i]);
   }
   return AESum / yTrue.length;
+}
+
+/**
+ * Compute the mean absolute percentage (MAPE)
+ * @param yTrue True values
+ * @param yPred Predicted values
+ * @returns score
+ */
+export function meanAbsolutePercentageError(yTrue: Array<f64>, yPred: Array<f64>): f64 {
+  let APESum = 0.0;
+  for (let i = 0; i < yTrue.length; i++) {
+    APESum += Math.abs(yTrue[i] - yPred[i]) / Math.max(1.0e-6, Math.abs(yTrue[i]));
+  }
+  return APESum / yTrue.length;
 }
 
 /**

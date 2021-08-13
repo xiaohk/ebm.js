@@ -36,6 +36,13 @@ utils.unitTestAssert(
   (t, r) => assert(Math.abs(t - r) <= 1e-6)
 );
 
+utils.unitTestAssert(
+  'MAPE computation',
+  () => myModule.__meanAbsolutePercentageError(y1, y2),
+  2.7136439667272474,
+  (t, r) => assert(Math.abs(t - r) <= 1e-6)
+);
+
 
 y1 = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1,
   1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0];

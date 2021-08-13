@@ -5,9 +5,10 @@
  */
 
 import { console } from 'as-console';
-import { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix,
-  getBalancedAccuracy
+import {
+  rootMeanSquaredError, meanAbsoluteError, meanAbsolutePercentageError,
+  countByThreshold, getROCCurve, getPRCurve, getROCAuc, getAveragePrecision,
+  getAccuracy, getConfusionMatrix, getBalancedAccuracy
 } from './metrics';
 
 /**
@@ -443,6 +444,7 @@ export class __EBM {
       let curResult = new Array<f64>();
       curResult.push(rootMeanSquaredError(this.labels, this.predLabels));
       curResult.push(meanAbsoluteError(this.labels, this.predLabels));
+      curResult.push(meanAbsolutePercentageError(this.labels, this.predLabels));
       output.push([curResult]);
     } else {
       // Compute ROC curves
@@ -450,7 +452,7 @@ export class __EBM {
       let rocPoints = getROCCurve(countResult);
       // let prPoints = getPRCurve(countResult);
 
-      output.push(rocPoints);
+      // output.push(rocPoints);
       // output.push(prPoints);
 
       // Compute confusion matrix
@@ -644,9 +646,10 @@ export class __EBM {
 }
 
 // Export the metrics functions to JS for testing
-export { rootMeanSquaredError, meanAbsoluteError, countByThreshold, getROCCurve,
-  getPRCurve, getROCAuc, getAveragePrecision, getAccuracy, getConfusionMatrix,
-  getBalancedAccuracy
+export {
+  rootMeanSquaredError, meanAbsoluteError, meanAbsolutePercentageError,
+  countByThreshold, getROCCurve, getPRCurve, getROCAuc, getAveragePrecision,
+  getAccuracy, getConfusionMatrix, getBalancedAccuracy
 };
 
 // We need unique array id so we can allocate them in JS
