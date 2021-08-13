@@ -418,7 +418,6 @@ export class __EBM {
       }
 
       // Track the sample ID in the index
-      // console.log([s, binIndex, curFeature]);
       if (binIndex >= 0) {
         curEditingFeatureSampleMap[binIndex].push(s);
       }

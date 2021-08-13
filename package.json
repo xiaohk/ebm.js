@@ -15,7 +15,8 @@
     "asbuild:untouched": "asc assembly/ebm.ts --target debug",
     "asbuild:optimized": "asc assembly/ebm.ts --target release",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
-    "build": "rollup -c && npm run asbuild"
+    "build": "rollup -c && npm run asbuild",
+    "debug": "rollup -c && npm run asbuild:untouched"
   },
   "author": "Jay Wang",
   "license": "MIT",
