@@ -9537,17 +9537,14 @@
    global.get $~lib/memory/__stack_pointer
    local.get $0
    call $assembly/metrics/getROCCurve
-   local.tee $1
+   local.tee $2
    i32.store offset=28
-   local.get $6
-   local.get $1
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
    global.get $~lib/memory/__stack_pointer
    local.get $3
    local.get $4
    f64.const 0.5
    call $assembly/metrics/getConfusionMatrix
-   local.tee $2
+   local.tee $1
    i32.store offset=24
    global.get $~lib/memory/__stack_pointer
    i32.const 1
@@ -9563,7 +9560,7 @@
    i32.store offset=36
    local.get $0
    i32.const 0
-   local.get $2
+   local.get $1
    call $~lib/array/Array<~lib/array/Array<i32>>#__uset
    global.get $~lib/memory/__stack_pointer
    local.get $0
@@ -9571,14 +9568,14 @@
    local.get $6
    local.get $0
    call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   local.get $1
+   local.get $2
    call $assembly/metrics/getROCAuc
    local.set $8
    local.get $3
    local.get $4
    call $assembly/metrics/getAccuracy
    local.set $9
-   local.get $2
+   local.get $1
    call $assembly/metrics/getBalancedAccuracy
    local.set $10
    global.get $~lib/memory/__stack_pointer
@@ -9693,6 +9690,11 @@
    local.get $4
    local.get $5
    call $assembly/metrics/meanAbsoluteError
+   call $~lib/array/Array<f64>#push
+   local.get $2
+   local.get $4
+   local.get $5
+   call $assembly/metrics/meanAbsolutePercentageError
    call $~lib/array/Array<f64>#push
    global.get $~lib/memory/__stack_pointer
    i32.const 1

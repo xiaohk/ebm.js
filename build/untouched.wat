@@ -13585,6 +13585,12 @@
    call $assembly/metrics/meanAbsoluteError
    call $~lib/array/Array<f64>#push
    drop
+   local.get $3
+   local.get $4
+   local.get $5
+   call $assembly/metrics/meanAbsolutePercentageError
+   call $~lib/array/Array<f64>#push
+   drop
    local.get $2
    global.get $~lib/memory/__stack_pointer
    i32.const 1
@@ -13682,10 +13688,6 @@
    call $assembly/metrics/getROCCurve
    local.tee $7
    i32.store offset=28
-   local.get $2
-   local.get $7
-   call $~lib/array/Array<~lib/array/Array<~lib/array/Array<f64>>>#push
-   drop
    global.get $~lib/memory/__stack_pointer
    local.get $5
    local.get $4

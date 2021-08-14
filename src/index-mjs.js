@@ -399,6 +399,7 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
 
           metrics.rmse = result1D[0];
           metrics.mae = result1D[1];
+          metrics.mape = result1D[2];
 
           __unpin(result1DPtr);
           __unpin(result2DPtr);
@@ -408,19 +409,19 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
           let result3D = __getArray(this.ebm.getMetrics());
           let result3DPtr = __pin(result3D);
 
-          let result1DPtrs = [];
-          let roc2D = __getArray(result3D[0]);
-          let result2DPtr = __pin(roc2D);
+          // let result1DPtrs = [];
+          // let roc2D = __getArray(result3D[0]);
+          // let result2DPtr = __pin(roc2D);
 
-          let rocPoints = roc2D.map(d => {
-            let point = __getArray(d);
-            result1DPtrs.push(__pin(point));
-            return point;
-          });
+          // let rocPoints = roc2D.map(d => {
+          //   let point = __getArray(d);
+          //   result1DPtrs.push(__pin(point));
+          //   return point;
+          // });
 
-          metrics.rocCurve = rocPoints;
-          result1DPtrs.map(d => __unpin(d));
-          __unpin(result2DPtr);
+          // metrics.rocCurve = rocPoints;
+          // result1DPtrs.map(d => __unpin(d));
+          // __unpin(result2DPtr);
 
           // Unpack PR curves
           // result1DPtrs = [];
@@ -438,8 +439,8 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
           // __unpin(result2DPtr);
 
           // Unpack confusion matrix
-          let result2D = __getArray(result3D[1]);
-          result2DPtr = __pin(result2D);
+          let result2D = __getArray(result3D[0]);
+          let result2DPtr = __pin(result2D);
 
           let result1D = __getArray(result2D[0]);
           let result1DPtr = __pin(result1D);
@@ -450,7 +451,7 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
           __unpin(result2DPtr);
 
           // Unpack summary statistics
-          result2D = __getArray(result3D[2]);
+          result2D = __getArray(result3D[1]);
           result2DPtr = __pin(result2D);
 
           result1D = __getArray(result2D[0]);
@@ -626,7 +627,6 @@ export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassific
 
         return metrics;
       }
-
 
       /**
        * Set the current sliced data (a level of a categorical feature)

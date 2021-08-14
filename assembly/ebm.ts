@@ -488,6 +488,7 @@ export class __EBM {
 
       curResult.push(rootMeanSquaredError(affectedLabels, affectedPredLabels));
       curResult.push(meanAbsoluteError(affectedLabels, affectedPredLabels));
+      curResult.push(meanAbsolutePercentageError(affectedLabels, affectedPredLabels));
       output.push([curResult]);
     } else {
       // Filter the affected labels and their predictions
@@ -502,8 +503,6 @@ export class __EBM {
       // Compute ROC curves
       let countResult = countByThreshold(affectedLabels, affectedPredLProbs);
       let rocPoints = getROCCurve(countResult);
-
-      output.push(rocPoints);
 
       // Compute confusion matrix
       let confusionMatrix = getConfusionMatrix(affectedLabels, affectedPredLProbs);
