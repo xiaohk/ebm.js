@@ -1,4 +1,4 @@
-const myModule = require('../../dist/cjs');
+const myModule = require('../../dist/cjs/ebm');
 
 const utils = require('./utils');
 

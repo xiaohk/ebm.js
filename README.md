@@ -1,4 +1,4 @@
-# EBM.JS
+# EBM.js
 
 [![build](https://github.com/xiaohk/ebm.js/workflows/build/badge.svg)](https://github.com/xiaohk/ebm.js/actions)
 
