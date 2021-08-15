@@ -2,7 +2,7 @@ const assert = require('assert');
 
 const fetch = require('node-fetch');
 
-const myModule = require('../../dist/cjs/ebm');
+const myModule = require('../..');
 
 const utils = require('./utils');
 

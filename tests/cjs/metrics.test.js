@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const myModule = require('../../dist/cjs/ebm');
+const myModule = require('../..');
 
 const utils = require('./utils');
 
