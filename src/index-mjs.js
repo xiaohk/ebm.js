@@ -1,13 +1,16 @@
 import loader from '@assemblyscript/loader';
 import { ConsoleImport } from 'as-console/imports.esm.js';
+import wasmB64 from '../build/optimized.wasm';
 
 const Console = new ConsoleImport();
 const imports = {...Console.wasmImports};
 
 
 export const initEBM = (_featureData, _sampleData, _editingFeature, _isClassification) => {
+  const wasmB64URL = 'data:application/octet-binary;base64,' + wasmB64;
+
   return loader.instantiate(
-    fetch('/build/optimized.wasm').then((result) => result.arrayBuffer()),
+    fetch(wasmB64URL).then((result) => result.arrayBuffer()),
     imports
   ).then(({ exports }) => {
     Console.wasmExports = exports;
